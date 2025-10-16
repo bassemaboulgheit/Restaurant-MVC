@@ -1,9 +1,9 @@
-﻿@model ItemsDto
+﻿@* @model ItemsDto 
 @{
     ViewData["Title"] = "Details";
 }
 
-@* <h1>Details</h1> *@
+@* <h1>Details</h1> 
 
 <div class="container mt-4">
     <!-- Header Section -->
@@ -14,19 +14,19 @@
 <table class="table table-bordered  table-hover">
     <thead>
         <tr>
-            @* <th>Id</th> *@
+            @* <th>Id</th> 
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
             <th>Category Name</th>
             <th>Quantity</th>
             <th>ImageUrl</th>
-            @* <th>Actions</th> *@
+            @* <th>Actions</th> 
         </tr>
     </thead>
     <tbody>
         <tr>
-            @* <td>@Model.Id</td> *@
+            @* <td>@Model.Id</td> 
             <td>@Model.Name</td>
             <td>@Model.Description</td>
             <td>@Model.Price</td>
@@ -43,7 +43,11 @@
                 }
             </td>
         </tr>
-        @* <a asp-action="GetAll" class="btn btn-info">Back To List</a> *@
+        @* <a asp-action="GetAll" class="btn btn-info">Back To List</a> 
     </tbody>
 </table>
-<a asp-action="GetAll" class="btn btn-info">Back To List</a>
+
+
+ <a asp-action="GetAll" class="btn btn-info">Back To List</a> *@
+
+<partial name="_ShowItem" />

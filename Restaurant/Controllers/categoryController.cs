@@ -11,10 +11,10 @@ namespace Restaurant.Controllers
 {
     public class categoryController : Controller
     {
-        private readonly IMenuCategoryService categoryService;
+        private readonly ICategoryService categoryService;
         private readonly IMenuItemService menuItemService;
 
-        public categoryController(IMenuCategoryService categoryService, IMenuItemService menuItemService)
+        public categoryController(ICategoryService categoryService, IMenuItemService menuItemService)
         {
             this.categoryService = categoryService;
             this.menuItemService = menuItemService;
@@ -52,11 +52,6 @@ namespace Restaurant.Controllers
             {
                 return View(newCategory);
             }
-            //if (await categoryService.GetByName(newCategory.Name) != null)
-            //{
-            //    ModelState.AddModelError("Name", "A category with this name already found.");
-            //    return View(newCategory);
-            //}
             await categoryService.Create(newCategory);
             return RedirectToAction("GetAll");
         }
@@ -110,7 +105,7 @@ namespace Restaurant.Controllers
             if (category != null && category.Name == name)
              return Json(true);
 
-            if (!await categoryService.GetByName1(name))
+            if (!await categoryService.GetByName(name))
                 return Json(true);
 
             return Json($"A category named {name} already exists.");

@@ -12,7 +12,7 @@ namespace Applications.Services
     {
         public Task<List<ItemsDto>> GetAll();
         public Task<ItemsDto?> GetById(int id);
-        public Task<ItemsDto> GetByName(string name);
+        //public Task<ItemsDto> GetByName(string name);
         public Task Create(ItemsDto newItem);
         public Task Update(ItemsDto newItem);
         public Task Delete(int id);

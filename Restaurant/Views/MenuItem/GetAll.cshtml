@@ -1,9 +1,9 @@
-﻿@model List<ItemsDto>
+﻿@*  @model List<ItemsDto>
 @{
     ViewData["Title"] = "GetAll";
-}
+} *@
 
-@* <h1>GetAll</h1> *@
+@* <h1>GetAll</h1> 
 
 <div class="container mt-4">
     <!-- Header Section -->
@@ -17,12 +17,12 @@
 <table class="table">
     <thead>
         <tr>
-            @* <th>Id</th> *@
+             <th>Id</th> *
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
             <th>Category Name</th>
-            <th>Quantity</th>
+            <th>Stock</th>
             <th>ImageUrl</th>
             <th>Actions</th>
         </tr>
@@ -31,13 +31,18 @@
         @foreach (var item in Model)
         {
             <tr>
-                @* <td>@item.Id</td> *@
+                 <td>@item.Id</td> 
                 <td>@item.Name</td>
                 <td>@item.Description</td>
                 <td>@item.Price</td>
                 <td>@item.Category.Name</td>
-                @* <td>@item.CategoryId</td> *@
-                <td>@item.Quantity</td>
+                @* <td>@item.CategoryId</td> 
+                @* <td>@item.Quantity</td> 
+				<td>
+                    <span class="badge @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
+                        @(item.Quantity > 0 ? "In Stock" : "Out of Stock")
+                    </span>
+                </td>
                 <td>
                     @if (!string.IsNullOrEmpty(item.ImageUrl))
                     {
@@ -56,4 +61,7 @@
                 </td>
             </tr>
         }
-	</tbody>
+	</tbody> *@
+
+<partial name="_ShowAll" />
+

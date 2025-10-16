@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public abstract class BaseModels
+    public abstract class BaseEntity
     {
         [Key]
         public int Id { get; set; }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
-    public class OrderItem : BaseModels
+    public class OrderItem : BaseEntity
     {
         [Required(ErrorMessage = "Quantity is required")]
         [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100")]

@@ -5,11 +5,13 @@ using Models;
 
 namespace Applications.Services
 {
-    public class MenuCategoryService : IMenuCategoryService
+    public class CategoryService : ICategoryService
     {
-        private readonly IMenuCategoryRepository categoryRepo;
+        private readonly IGenericRepository<Category> categoryRepo;
 
-        public MenuCategoryService(IMenuCategoryRepository categoryRepo)
+        //private readonly IMenuCategoryRepository categoryRepo;
+
+        public CategoryService(IGenericRepository<Category> categoryRepo)
         {
             this.categoryRepo = categoryRepo;
         }
@@ -36,7 +38,7 @@ namespace Applications.Services
         }
         public async Task<CategoryDto?> GetById(int id)
         {
-            var menuCategory = await categoryRepo.GetById(id);
+            var menuCategory = await categoryRepo.GetById(id, i => i.MenuItems);
             if (menuCategory == null)
             {
                 return null;
@@ -58,18 +60,18 @@ namespace Applications.Services
             };
             return categoryDto;
         }
-        public async Task<CategoryDto> GetByName(string name)
-        {
-            var menuCategory = await categoryRepo.GetByName(name);
-            if (menuCategory == null) {
-                return null;
-            }
-            var categoryDto = new CategoryDto()
-                {
-                Name = menuCategory.Name
-            };
-            return categoryDto;
-        }
+        //public async Task<CategoryDto> GetByName(string name)
+        //{
+        //    var menuCategory = await categoryRepo.GetByName(name);
+        //    if (menuCategory == null) {
+        //        return null;
+        //    }
+        //    var categoryDto = new CategoryDto()
+        //        {
+        //        Name = menuCategory.Name
+        //    };
+        //    return categoryDto;
+        //}
         public async Task Create(CategoryDto newCategory)
         {
             if (newCategory == null)
@@ -107,9 +109,9 @@ namespace Applications.Services
             await categoryRepo.Save();
         }
 
-        public async Task<bool> GetByName1(string name)
+        public async Task<bool> GetByName(string name)
         {
-            var category =  categoryRepo.GetByName1(name);
+            var category =  categoryRepo.GetByName(name);
             if (category == null)
             {
                 return false;

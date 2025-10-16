@@ -32,7 +32,7 @@ namespace Infrastructure
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var now = DateTime.UtcNow;
-            foreach (var entry in ChangeTracker.Entries<BaseModels>())
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
             {
                 if (entry.State == EntityState.Added)
                 {

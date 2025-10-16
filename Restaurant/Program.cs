@@ -30,7 +30,8 @@ namespace Restaurant
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<RestaurantDb>();
 
-            builder.Services.AddScoped<IMenuCategoryService,MenuCategoryService>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<ICategoryService,CategoryService>();
             builder.Services.AddScoped<IMenuCategoryRepository,MenuCategoryRepository>();
             builder.Services.AddScoped<IMenuItemService, MenuItemService>();
             builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();

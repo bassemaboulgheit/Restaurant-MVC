@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
-    public class MenuItem : BaseModels
+    public class MenuItem : BaseEntity
     {
 
         [Required(ErrorMessage = "Item name is required")]

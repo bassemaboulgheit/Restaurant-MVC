@@ -18,7 +18,7 @@ namespace Models
         Delivered,
         Cancelled
     }
-    public class Order : BaseModels
+    public class Order : BaseEntity
     {
 
         [Required(ErrorMessage = "Order type is required")]

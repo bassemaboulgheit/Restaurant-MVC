@@ -9,9 +9,9 @@ namespace Restaurant.Controllers
     public class MenuItemController : Controller
     {
         private readonly IMenuItemService itemService;
-        private readonly IMenuCategoryService categoryService;
+        private readonly ICategoryService categoryService;
 
-        public MenuItemController(IMenuItemService itemService, IMenuCategoryService categoryService)
+        public MenuItemController(IMenuItemService itemService, ICategoryService categoryService)
         {
             this.itemService = itemService;
             this.categoryService = categoryService;
@@ -41,11 +41,6 @@ namespace Restaurant.Controllers
             {
                 return View(newItem);
             }
-            //if (await categoryService.GetByName(newItem.Name) != null)
-            //{
-            //    ModelState.AddModelError("Name", "A MenuItem with this name already found.");
-            //    return View(newItem);
-            //}
             await itemService.Create(newItem);
             return RedirectToAction("GetAll");
         }

@@ -6,15 +6,17 @@ namespace Applications.Services
 {
     public class MenuItemService : IMenuItemService
     {
-        private readonly IMenuItemRepository itemRepo;
+        private readonly IGenericRepository<MenuItem> itemRepo;
 
-        public MenuItemService(IMenuItemRepository itemRepo)
+        //private readonly IMenuItemRepository itemRepo;
+
+        public MenuItemService(IGenericRepository<MenuItem> itemRepo)
         {
             this.itemRepo = itemRepo;
         }
         public async Task<List<ItemsDto>> GetAll()
         {
-            var items = await itemRepo.GetAll();
+            var items = await itemRepo.GetAll(c => c.Category);
             var itemDto = items.Select(item => new ItemsDto
             {
                 Id = item.Id,
@@ -35,13 +37,14 @@ namespace Applications.Services
         }
         public async Task<ItemsDto?> GetById(int id)
         {
-            var menuItem = await itemRepo.GetById(id);
+            var menuItem = await itemRepo.GetById(id,c=>c.Category);
             if (menuItem == null) return null;
             return new ItemsDto
             {
                 Id = menuItem.Id,
                 Name = menuItem.Name,
                 Description = menuItem.Description,
+                Quantity = menuItem.Quantity,
                 Price = menuItem.Price,
                 ImageUrl = menuItem.ImageUrl,
                 CategoryId = menuItem.CategoryId,
@@ -52,17 +55,17 @@ namespace Applications.Services
                 },
             };
         }
-        public async Task<ItemsDto> GetByName(string name)
-        {
-            var item = await itemRepo.GetByName(name);
-            if (item == null) return null;
-            var itemDto = new ItemsDto
-            {
-                Name = item.Name
-            };
+        //public async Task<ItemsDto> GetByName(string name)
+        //{
+        //    var item = await itemRepo.GetByName(name);
+        //    if (item == null) return null;
+        //    var itemDto = new ItemsDto
+        //    {
+        //        Name = item.Name
+        //    };
 
-            return itemDto;
-        }
+        //    return itemDto;
+        //}
         public async Task Create(ItemsDto newItem)
         {
             if (newItem == null)

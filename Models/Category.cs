@@ -2,7 +2,7 @@
 
 namespace Models
 {
-    public class Category  : BaseModels
+    public class Category  : BaseEntity
     {
 
         [Required(ErrorMessage = "Category name is required")]
