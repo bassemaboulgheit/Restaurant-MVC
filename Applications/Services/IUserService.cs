@@ -11,13 +11,13 @@ namespace Applications.Services
 {
     public interface IUserService
     {
-        public  Task<IdentityResult> CreateAsync(RegisterDto user, string password);
+        public  Task<IdentityResult> CreateAsync(RegisterDto user);
         public  Task<ApplicationUser> FindByEmailAsync(string email);
         public  Task<ApplicationUser> FindByNameAsync(string name);
         public  Task<bool> IsEmailAvailableAsync(string email);
-        public  Task<bool> CheckPasswordAsync(RegisterDto user, string password);
-        public  Task<IdentityResult> AddToRoleAsync(RegisterDto user, string role);
-        public  Task SignInAsync(RegisterDto user, bool isPersistent = false);
+        public Task<bool> CheckPasswordAsync(LoginDto user);
+        public  Task<IdentityResult> AddToRoleAsync(LoginDto user, string role);
+        public  Task<bool> SignInAsync(LoginDto user);
         public Task SignOutAsync();
     }
 }

@@ -10,7 +10,7 @@ namespace Infrastructure.Contracts
 {
     public interface IUserRepository
     {
-        public Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
+        public Task<IdentityResult> CreateAsync(ApplicationUser user ,string password);
         public Task<ApplicationUser?> FindByEmailAsync(string email);
         public Task<ApplicationUser?> FindByNameAsync(string name);
         public Task<ApplicationUser?> FindByIdAsync(string userId);

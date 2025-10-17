@@ -1,6 +1,7 @@
 using Applications.Contracts;
 using Applications.Services;
 using Infrastructure;
+using Infrastructure.Contracts;
 using Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,10 @@ namespace Restaurant
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSession(option=>
+            {
+                option.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
 
             builder.Services.AddDbContext<RestaurantDb>(options =>
              options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -31,6 +36,8 @@ namespace Restaurant
             .AddEntityFrameworkStores<RestaurantDb>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICategoryService,CategoryService>();
             builder.Services.AddScoped<IMenuCategoryRepository,MenuCategoryRepository>();
             builder.Services.AddScoped<IMenuItemService, MenuItemService>();
@@ -47,6 +54,8 @@ namespace Restaurant
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            
             app.UseAuthorization();
 
             app.MapControllerRoute(

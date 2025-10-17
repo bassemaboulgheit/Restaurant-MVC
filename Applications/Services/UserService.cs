@@ -21,7 +21,7 @@ namespace Applications.Services
             this.signInManager = signInManager;
         }
 
-        public async Task<IdentityResult> CreateAsync(RegisterDto user, string password)
+        public async Task<IdentityResult> CreateAsync(RegisterDto user)
         {
             if (user != null)
             {
@@ -30,22 +30,25 @@ namespace Applications.Services
                 {
                     throw new Exception("Email is already in use");
                 }
+                //mapping DTO to ApplicationUser
                 var ApplicationUser = new ApplicationUser
                 {
                     UserName = user.userName,
-                    PasswordHash = password,
+                    //PasswordHash = user.Password,
                     Email = user.Email,
                     Address = user.Address
                 };
-                var result = await userRepo.CreateAsync(ApplicationUser, password);
-                if (!result.Succeeded)
+                // save user to database
+                IdentityResult result = await userRepo.CreateAsync(ApplicationUser,user.Password);
+                if (result.Succeeded)
                 {
-                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    throw new Exception($"Failed to create user: {errors}");
+                    //create cookie
+                    await signInManager.SignInAsync(ApplicationUser, isPersistent: false);
+                    return result;
                 }
-                return result;
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Failed to create user: {errors}");
             }
-            
             throw new Exception("User data is null");
         }
         public async Task<ApplicationUser> FindByEmailAsync(string email)
@@ -75,45 +78,30 @@ namespace Applications.Services
             var result = await userRepo.IsEmailAvailableAsync(email);
             return result;
         }
-
-        public async Task<bool> CheckPasswordAsync(RegisterDto user, string password)
+        public async Task<bool> CheckPasswordAsync(LoginDto userDto)
         {
-            if (user != null)
+            if (userDto != null)
             {
-                var existingUser = await userRepo.FindByEmailAsync(user.Email);
-                if (existingUser == null)
+                ApplicationUser? user = await userRepo.FindByNameAsync(userDto.userName);
+                if (user != null)
                 {
-                    var ApplicationUser = new ApplicationUser
-                    {
-                        UserName = user.userName,
-                        PasswordHash = password,
-                        Email = user.Email,
-                        Address = user.Address
-                    };
-                    var result = await userRepo.CheckPasswordAsync(existingUser, password);
+                    var result = await userRepo.CheckPasswordAsync(user, userDto.Password);
                     return result;
                 }
                 throw new Exception("User not found");
             }
-            throw new Exception("User data is null");
+            return false;
         }
-        public async Task<IdentityResult> AddToRoleAsync(RegisterDto user, string role)
+        public async Task<IdentityResult> AddToRoleAsync(LoginDto userDto, string role) 
         {
-            if (user != null)
+            if (userDto != null)
             {
-                var existingUser = await userRepo.FindByEmailAsync(user.Email);
+                var existingUser = await userRepo.FindByNameAsync(userDto.userName);
                 if (existingUser == null)
                 {
                     throw new Exception("User not found");
                 }
-                var ApplicationUser = new ApplicationUser
-                {
-                    UserName = user.userName,
-                    PasswordHash = user.Password,
-                    Email = user.Email,
-                    Address = user.Address
-                };
-                var result = await userRepo.AddToRoleAsync(ApplicationUser, role);
+                var result = await userRepo.AddToRoleAsync(existingUser, role);
                 if (!result.Succeeded)
                 {
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -123,26 +111,19 @@ namespace Applications.Services
             }
             throw new Exception("User data is null");
         }
-        public async Task SignInAsync(RegisterDto userDto, bool isPersistent = false)
+        public async Task<bool> SignInAsync(LoginDto userDto)
         {
-            var user = await userRepo.FindByEmailAsync(userDto.Email);
-            if (user == null)
+            var user = await userRepo.FindByNameAsync(userDto.userName);
+            if (user != null)
             {
-                throw new Exception("User not found");
+                var result = await userRepo.CheckPasswordAsync(user, userDto.Password);
+                if (result)
+                {
+                    await signInManager.SignInAsync(user,userDto.RememberMe);
+                    return true;
+                }
             }
-            var result = await userRepo.CheckPasswordAsync(user, userDto.Password);
-            if (!result)
-            {
-                throw new Exception("Invalid password");
-            }
-            var ApplicationUser = new ApplicationUser
-            {
-                UserName = userDto.userName,
-                PasswordHash = userDto.Password,
-                Email = userDto.Email,
-                Address = userDto.Address
-            };
-            await signInManager.SignInAsync(ApplicationUser, isPersistent);
+            return false;
         }
         public async Task SignOutAsync()
         {

@@ -21,9 +21,10 @@ namespace Infrastructure.Repository
             this.userManager = userManager;
         }
 
-        public async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        public async Task<IdentityResult> CreateAsync(ApplicationUser user ,string password)
         {
-            return await userManager.CreateAsync(user, password);
+
+            return await userManager.CreateAsync(user,password);
         }
 
         public async Task<ApplicationUser?> FindByIdAsync(string userId)
@@ -35,18 +36,18 @@ namespace Infrastructure.Repository
             return await userManager.FindByEmailAsync(email);
         }
 
-        public async Task<ApplicationUser?> FindByNameAsync(string name)
+        public async Task<ApplicationUser?> FindByNameAsync(string userName)
         {
-            return await userManager.FindByNameAsync(name);
+            return await userManager.FindByNameAsync(userName);
         }
         public async Task<bool> IsEmailAvailableAsync(string email)
         {
-            var user = await userManager.FindByEmailAsync(email);
-            return user == null;
+            var applicationUser = await userManager.FindByEmailAsync(email);
+            return applicationUser == null;
         }
         public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
         {
-            return await userManager.CheckPasswordAsync(user, password);
+            return await userManager.CheckPasswordAsync(user ,password);
         }
 
         public async Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)

@@ -1,11 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Applications.DTos;
 using Applications.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
 namespace Restaurant.Controllers
 {
+    [Authorize]
     public class MenuItemController : Controller
     {
         private readonly IMenuItemService itemService;
