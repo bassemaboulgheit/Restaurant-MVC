@@ -1,9 +1,9 @@
-﻿@*  @model List<ItemsDto>
+﻿ @model List<ItemsDto>
 @{
     ViewData["Title"] = "GetAll";
-} *@
+} 
 
-@* <h1>GetAll</h1> 
+@* <h1>GetAll</h1>  *@
 
 <div class="container mt-4">
     <!-- Header Section -->
@@ -17,7 +17,7 @@
 <table class="table">
     <thead>
         <tr>
-             <th>Id</th> *
+             @* <th>Id</th>  *@
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
@@ -36,8 +36,8 @@
                 <td>@item.Description</td>
                 <td>@item.Price</td>
                 <td>@item.Category.Name</td>
-                @* <td>@item.CategoryId</td> 
-                @* <td>@item.Quantity</td> 
+                 @* <td>@item.CategoryId</td>  *@
+                 <td>@item.Quantity</td> 
 				<td>
                     <span class="badge @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
                         @(item.Quantity > 0 ? "In Stock" : "Out of Stock")
@@ -61,7 +61,7 @@
                 </td>
             </tr>
         }
-	</tbody> *@
+	</tbody> 
 
-<partial name="_ShowAll" />
+@* <partial name="_ShowAll" /> *@
 

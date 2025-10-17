@@ -11,21 +11,20 @@ namespace Applications.DTos
     {
         //public Guid Id { get; set; }
 
-        [Required(ErrorMessage = " name is required")]
-        public string Name { get; set; }
+        [Required(ErrorMessage = " userame is required")]
+        [Display(Name = "User Name")]
+        public string userName { get; set; }
 
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
         [Compare("Password", ErrorMessage = "Password and confirmation password do not match.")]
+        [Display(Name = "Confirm Password")]
+        [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
         [DataType(DataType.EmailAddress, ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
-
-        public string Role { get; set; }
-
-
         public string? Address { get; set; }
     }
 }

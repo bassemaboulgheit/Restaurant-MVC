@@ -40,7 +40,8 @@ namespace Models
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
 
-        [Display(Name = "Daily Order Count")]
+
+        //[Display(Name = "Daily Order Count")]
         //public int DailyOrderCount { get; set; } = 0;
 
 

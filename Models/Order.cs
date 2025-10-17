@@ -67,7 +67,8 @@ namespace Models
         [DataType(DataType.DateTime)]
         public DateTime? EstimatedDeliveryTime { get; set; }
 
-        public  List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public string ApplicationUserId { get; set; }
+        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public ApplicationUser ApplicationUser { get; set; } = new ApplicationUser();
 
 
