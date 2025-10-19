@@ -1,0 +1,31 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<IdentityRole>
+
+@{
+    ViewData["Title"] = "All Roles";
+}
+
+<h2>All Roles</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">No roles found.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Role Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -9,39 +9,39 @@
     <div class="col-md-4">
         <form asp-action="Register" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
-			<div class=" form-group">
+            <div class=" form-group">
                 <label asp-for="userName"></label>
                 <input asp-for="userName" class="form-control" />
-				<span asp-validation-for="userName" class="text-danger"></span>
+                <span asp-validation-for="userName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Password"></label>
-				<input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-				<label asp-for="ConfirmPassword"></label>
+                <label asp-for="ConfirmPassword"></label>
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
-			<div class="form-group">
+            <div class="form-group">
                 <label asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" />
-				<span asp-validation-for="Email" class="text-danger"></span>
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Address"></label>
-				<input asp-for="Address" class="form-control" />
+                <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="form-group">
-				<input type="submit" value="Register" class="btn btn-primary" />
+                <input type="submit" value="Register" class="btn btn-primary" />
             </div>
-		</form>
-	</div>
+        </form>
+    </div>
 </div>
 <div>
-	<a asp-action="Login">Already have an account? Login</a>
+    <a asp-action="Login">Already have an account? Login</a>
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

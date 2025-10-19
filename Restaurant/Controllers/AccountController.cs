@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+using System.Threading.Tasks;
 using Applications.DTos;
 using Applications.Services;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 
 namespace Restaurant.Controllers
@@ -30,19 +31,18 @@ namespace Restaurant.Controllers
                     ModelState.AddModelError("ConfirmPassword", "Password and confirmation password do not match.");
                     return View(userDto);
                 }
-                if (!await userService.IsEmailAvailableAsync(userDto.Email))
+
+                var result = await userService.CreateAsync(userDto);
+                if (result.Succeeded)
                 {
-                    ModelState.AddModelError("Email", "Email is already in use.");
-                    return View(userDto);
+                    TempData["SuccessMessage"] = "Registration completed successfully. Please log in";
+                    return RedirectToAction("Login");
                 }
-                if (await userService.FindByNameAsync(userDto.userName) != null)
+
+                foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("userName", "Username is already taken.");
-                    return View(userDto);
+                    ModelState.AddModelError("", error.Description);
                 }
-                await userService.CreateAsync(userDto);
-                // Registration logic here
-                return RedirectToAction("Login");
             }
             return View(userDto);
         }
@@ -54,19 +54,17 @@ namespace Restaurant.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDto userDto)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                // check
-                var user = await userService.FindByNameAsync(userDto.userName);
-                if (user != null)
-                {
-                    bool found = await userService.CheckPasswordAsync(userDto);
-                    if(found == true)
-                    {   
-                        await userService.SignInAsync(userDto);
-                        return RedirectToAction("GetAll","MenuItem");
-                    }
-                }
+                var result = await userService.SignInAsync(userDto);
+
+                if (result.Succeeded)
+                 return RedirectToAction("GetAll", "MenuItem");
+
+                if (result.IsLockedOut)
+                    ModelState.AddModelError("", "Account locked. Try again later.");
+
+                else
                 ModelState.AddModelError("", "User Name Or Password Wrong");
             }
             return View("Login",userDto);
@@ -76,6 +74,5 @@ namespace Restaurant.Controllers
             await userService.SignOutAsync();
             return View("Login");
         }
-
     }
 }

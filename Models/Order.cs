@@ -48,7 +48,6 @@ namespace Models
 
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Tax Amount (8.5%)")]
-        [DataType(DataType.Currency)]
         public decimal TaxAmount { get; set; }
 
 
@@ -59,7 +58,6 @@ namespace Models
 
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Total Amount")]
-        //[DataType(DataType.Currency)]
         public decimal TotalAmount { get; set; }
 
 
@@ -67,6 +65,7 @@ namespace Models
         [DataType(DataType.DateTime)]
         public DateTime? EstimatedDeliveryTime { get; set; }
 
+        public int TotalPreparationTime { get; set; }
         public string ApplicationUserId { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public ApplicationUser ApplicationUser { get; set; } = new ApplicationUser();

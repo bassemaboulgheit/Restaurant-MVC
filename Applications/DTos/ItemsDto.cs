@@ -47,6 +47,6 @@ namespace Applications.DTos
 
         public CategoryDto Category { get; set; } 
 
-        //public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public List<OrderItemsDto> OrderItems { get; set; } = new List<OrderItemsDto>();
     }
 }

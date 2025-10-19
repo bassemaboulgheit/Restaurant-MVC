@@ -31,13 +31,13 @@
         @foreach (var item in Model)
         {
             <tr>
-                 <td>@item.Id</td> 
+                 @* <td>@item.Id</td>  *@
                 <td>@item.Name</td>
                 <td>@item.Description</td>
                 <td>@item.Price</td>
                 <td>@item.Category.Name</td>
+                 @* <td>@item.Quantity</td>  *@
                  @* <td>@item.CategoryId</td>  *@
-                 <td>@item.Quantity</td> 
 				<td>
                     <span class="badge @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
                         @(item.Quantity > 0 ? "In Stock" : "Out of Stock")

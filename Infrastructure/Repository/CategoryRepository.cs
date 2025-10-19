@@ -9,11 +9,11 @@ using Models;
 
 namespace Infrastructure.Repository
 {
-    public class MenuCategoryRepository : IMenuCategoryRepository
+    public class CategoryRepository : IMenuCategoryRepository
     {
         private readonly RestaurantDb context;
 
-        public MenuCategoryRepository(RestaurantDb context)
+        public CategoryRepository(RestaurantDb context)
         {
             this.context = context;
         }

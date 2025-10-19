@@ -1,0 +1,40 @@
+﻿@model AssignRoleDto
+@{
+    ViewData["Title"] = "Assign Role";
+}
+
+<h2 class="mb-3">Assign Role to User</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="AssignRole" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="UserNameOrEmail" class="form-label"></label>
+        <input asp-for="UserNameOrEmail" class="form-control" placeholder="Enter username or email" />
+        <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="RoleName" class="form-label"></label>
+        <select asp-for="RoleName" class="form-select" asp-items="Model.Roles">
+            <option value="">-- Select Role --</option>
+        </select>
+        <span asp-validation-for="RoleName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Assign Role</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

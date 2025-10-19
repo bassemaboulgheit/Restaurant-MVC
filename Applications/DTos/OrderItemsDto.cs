@@ -1,10 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Models;
 
-namespace Models
+namespace Applications.DTos
 {
-    public class OrderItem : BaseEntity
+    public class OrderItemsDto
     {
+        public int Id { get; set; }
+
+
         [Required(ErrorMessage = "Quantity is required")]
         [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100")]
         [Display(Name = "Quantity")]
@@ -19,9 +28,8 @@ namespace Models
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Subtotal")]
         [DataType(DataType.Currency)]
-        public decimal Subtotal { get; set; }
+        public decimal Subtotal { get; set; } 
 
-        // Navigation Properties
         [Required]
         [Display(Name = "Order")]
         [ForeignKey("Order")]
@@ -31,16 +39,7 @@ namespace Models
         [Display(Name = "Menu Item")]
         [ForeignKey("MenuItem")]
         public int MenuItemId { get; set; }
-        public  Order Order { get; set; } 
-        public  MenuItem MenuItem { get; set; } = new MenuItem();
-
-
-
-        // Business Logic Method
-        //public void CalculateSubtotal()
-        //{
-        //    Subtotal = Quantity * UnitPrice;
-        //}
+        public Order? Order { get; set; }
+        public MenuItem? MenuItem { get; set; }
     }
-
 }
