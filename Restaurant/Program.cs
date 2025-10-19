@@ -22,7 +22,7 @@ namespace Restaurant
             {
                 option.IdleTimeout = TimeSpan.FromMinutes(30);
             });
-
+           
             builder.Services.AddDbContext<RestaurantDb>(options =>
              options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -65,7 +65,10 @@ namespace Restaurant
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                //pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
+            //pattern: "{area=Customer}/{controller=MenuItem}/{action=getAll}/{id?}");
 
             app.Run();
         }

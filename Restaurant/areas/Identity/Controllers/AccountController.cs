@@ -2,11 +2,13 @@
 using System.Threading.Tasks;
 using Applications.DTos;
 using Applications.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
-namespace Restaurant.Controllers
+namespace Restaurant.areas.Identity.Controllers
 {
+    [Area(nameof(Identity))]
     public class AccountController : Controller
     {
         private readonly IUserService userService;
@@ -36,7 +38,7 @@ namespace Restaurant.Controllers
                 if (result.Succeeded)
                 {
                     TempData["SuccessMessage"] = "Registration completed successfully. Please log in";
-                    return RedirectToAction("Login");
+                    return RedirectToAction(nameof(Login));
                 }
 
                 foreach (var error in result.Errors)
@@ -59,7 +61,10 @@ namespace Restaurant.Controllers
                 var result = await userService.SignInAsync(userDto);
 
                 if (result.Succeeded)
+                    //var roles = userService.GetAllRolesAsync(); 
+
                  return RedirectToAction("GetAll", "MenuItem");
+                //return RedirectToAction(nameof(MenuItemController.GetAll));
 
                 if (result.IsLockedOut)
                     ModelState.AddModelError("", "Account locked. Try again later.");
@@ -72,7 +77,7 @@ namespace Restaurant.Controllers
         public async Task<IActionResult> SignOut()
         {
             await userService.SignOutAsync();
-            return View("Login");
+            return RedirectToAction(nameof(Login));
         }
     }
 }

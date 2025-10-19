@@ -20,9 +20,13 @@ namespace Infrastructure.Repository
             dbSet = context.Set<T>();
         }
 
-        public async Task<List<T>> GetAll(params Expression<Func<T, object>>[] includes)
+        public async Task<List<T>> GetAll( Expression<Func<T, object>>[]? includes = null)
+        //public async Task<IQueryable<T>> Get(Expression<Func<T, bool>>? filter = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true)
         {
             IQueryable<T> query = dbSet;
+            //if (filter != null)
+            //{ query = query.Where(filter); }
+
             if (includes != null)
             {
                 foreach (var include in includes)
@@ -30,7 +34,13 @@ namespace Infrastructure.Repository
                     query = query.Include(include);
                 }
             }
-            return await query.ToListAsync();
+            //if (!tracked)
+            //{
+            //    query = query.AsNoTracking();
+            //}
+            //return  query;
+
+            return  await  query.ToListAsync();
         }
 
         public async Task<T?> GetById(int id , params Expression<Func<T, object>>[] includes)

@@ -19,6 +19,7 @@ namespace Applications.Services
         public async Task<List<CategoryDto>> GetAll()
         {
             var categories = await categoryRepo.GetAll();
+            //var categories = await categoryRepo.Get();
             var categoryDtos = categories.Select(category => new CategoryDto
             {
                 Id = category.Id,
@@ -111,12 +112,12 @@ namespace Applications.Services
 
         public async Task<bool> GetByName(string name)
         {
-            var category =  categoryRepo.GetByName(name);
+            var category = await categoryRepo.GetByName(name);
             if (category == null)
             {
                 return false;
             }
-            return await category;
+            return  category;
         }
     }
 }

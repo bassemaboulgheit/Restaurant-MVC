@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace Restaurant.Controllers
+namespace Restaurant.areas.Identity.Controllers
 {
-    //[Authorize(Roles ="Admin")] 
+    //[Authorize(Roles ="Admin")]
+    [Area(nameof(Identity))]
     public class AdminController : Controller
     {
         private readonly IUserService userService;
@@ -53,6 +54,7 @@ namespace Restaurant.Controllers
         }
 
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignRole()
         {
             var roles = await roleManager.Roles

@@ -1,20 +1,18 @@
-﻿using System.Runtime.Intrinsics.Arm;
-using System.Threading.Tasks;
-using Applications.DTos;
+﻿using Applications.DTos;
 using Applications.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Models;
 
-namespace Restaurant.Controllers
+namespace Restaurant.areas.Admin.Controllers
 {
-    public class categoryController : Controller
+    [Area(nameof(Admin))]
+    //[Authorize(Roles = "Admin")]
+    public class CategoryController : Controller
     {
         private readonly ICategoryService categoryService;
         private readonly IMenuItemService menuItemService;
 
-        public categoryController(ICategoryService categoryService, IMenuItemService menuItemService)
+        public CategoryController(ICategoryService categoryService, IMenuItemService menuItemService)
         {
             this.categoryService = categoryService;
             this.menuItemService = menuItemService;
@@ -35,10 +33,10 @@ namespace Restaurant.Controllers
             ViewBag.item = await menuItemService.GetAll();
             return View(category);
         }
-        public async Task<IActionResult> Search(string name) 
+        public async Task<IActionResult> Search(string name)
         {
             var categories = await categoryService.GetByName(name);
-            return View("GetAll",categories);
+            return View("GetAll", categories);
         }
         public async Task<IActionResult> Create()
         {
@@ -99,11 +97,11 @@ namespace Restaurant.Controllers
 
 
         [AcceptVerbs("GET", "POST")]
-        public async Task<IActionResult> VerifyName(string name,int id)
+        public async Task<IActionResult> VerifyName(string name, int id)
         {
             var category = await categoryService.GetById(id);
             if (category != null && category.Name == name)
-             return Json(true);
+                return Json(true);
 
             if (!await categoryService.GetByName(name))
                 return Json(true);

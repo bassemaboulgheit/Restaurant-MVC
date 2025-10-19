@@ -66,6 +66,16 @@ namespace Applications.Services
 
         //    return itemDto;
         //}
+
+        public async Task<bool> GetByName(string name)
+        {
+            var item = await itemRepo.GetByName(name);
+            if (item == null)
+            {
+                return false;
+            }
+            return  item;
+        }
         public async Task Create(ItemsDto newItem)
         {
             if (newItem == null)

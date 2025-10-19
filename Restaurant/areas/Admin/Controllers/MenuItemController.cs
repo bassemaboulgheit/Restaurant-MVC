@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
-namespace Restaurant.Controllers
+namespace Restaurant.areas.Admin.Controllers
 {
     [Authorize]
+    [Area(nameof(Admin))]
     public class MenuItemController : Controller
     {
         private readonly IMenuItemService itemService;
