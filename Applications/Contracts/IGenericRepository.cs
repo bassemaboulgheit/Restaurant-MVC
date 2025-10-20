@@ -10,12 +10,15 @@ namespace Applications.Contracts
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {
-        Task<List<T>> GetAll(params Expression<Func<T, object>>[] includes);
+        Task<IQueryable<T>> GetAll(params Expression<Func<T, object>>[] includes);
+
         //public Task<IQueryable<T>> Get(Expression<Func<T, bool>>? filter = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true);
 
         Task<T?> GetById(int id, params Expression<Func<T, object>>[] includes);
-        Task<bool> GetByName(string name);
-        Task<List<T>> GetListByName(string name);
+        Task<bool> GetByName(string name, params Expression<Func<T, object>>[] includes);
+        Task<T?> GetName(string name, params Expression<Func<T, object>>[] includes);
+        Task<List<T>> GetListByName(string name, params Expression<Func<T, object>>[] includes);
+
         Task Create(T entity);
         Task Update(T entity);
         Task Delete(int id);

@@ -11,16 +11,16 @@ namespace Applications.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly IGenericRepository<Order> orderRepo;
+        private readonly IGenericRepository<Order> _orderRepo;
 
-        public OrderService(IGenericRepository<Order> orderRepo)
+        public OrderService(IGenericRepository<Order> _orderRepo)
         {
-            this.orderRepo = orderRepo;
+            this._orderRepo = _orderRepo;
         }
 
         public async Task<List<OrderDto>> GetAll()
         {
-            var orders = await orderRepo.GetAll(o=> o.OrderItems, o=> o.ApplicationUser);
+            var orders = await _orderRepo.GetAll(o=> o.OrderItems, o=> o.ApplicationUser);
             var ordersDto = orders.Select(i => new OrderDto
             {
                 Id = i.Id,
@@ -48,7 +48,7 @@ namespace Applications.Services
         }
         public async Task<OrderDto?> GetById(int orderId)
         {
-            var order = await orderRepo.GetById(orderId);
+            var order = await _orderRepo.GetById(orderId);
             var orderDto = new OrderDto
             {
                 Id = order.Id,
@@ -94,8 +94,8 @@ namespace Applications.Services
                     UnitPrice = oi.UnitPrice
                 }).ToList()
             };
-            await orderRepo.Create(order);
-            await orderRepo.Save();
+            await _orderRepo.Create(order);
+            await _orderRepo.Save();
         }
 
         public async Task CancelOrder(OrderDto orderDto)
@@ -104,11 +104,11 @@ namespace Applications.Services
 
         public async Task Delete(int orderId)
         {
-            var order = await orderRepo.GetById(orderId);
+            var order = await _orderRepo.GetById(orderId);
             if (order != null)
             {
-                await orderRepo.Delete(order.Id);
-                await orderRepo.Save();
+                await _orderRepo.Delete(order.Id);
+                await _orderRepo.Save();
             }
         }
     }

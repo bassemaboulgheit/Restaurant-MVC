@@ -1,0 +1,69 @@
+﻿@using Applications.Services  
+@inject ICategoryService categoryService
+
+@{
+    var categories = await categoryService.GetAll();
+}
+
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MazaQ</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav me-auto">
+                <!-- Dropdown Categories -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Categories
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        @foreach (var category in categories)
+                        {
+                            <li>
+                                <a class="dropdown-item"
+                                   asp-area="Customer"
+                                   asp-controller="Category"
+                                   asp-action="Details"
+                                   asp-route-Id="@category.Id">
+                                    @category.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+
+                <!-- Menu Items -->
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Customer" asp-controller="MenuItem" asp-action="GetAll">Menu Items</a>
+                </li>
+
+                <!-- Auth Links -->
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">Login</a>
+                </li>
+            </ul>
+
+            <!-- Search Form -->
+            <form class="d-flex" asp-area="Customer" asp-controller="Category" asp-action="Search" method="get">
+                <input class="form-control me-sm-2" type="search" name="searchTerm" placeholder="Search menu...">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+
+            <!-- User Greeting -->
+            @if (User.Identity.IsAuthenticated)
+            {
+                <span class="navbar-text ms-3 text-light">
+                    Hello, @User.Identity.Name
+                </span>
+            }
+        </div>
+    </div>
+</nav>

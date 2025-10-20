@@ -7,19 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace Restaurant.areas.Identity.Controllers
+namespace Restaurant.areas.Admin.Controllers
 {
-    //[Authorize(Roles ="Admin")]
-    [Area(nameof(Identity))]
+    [Authorize(Roles ="Admin")]
+    [Area(nameof(Admin))]
     public class AdminController : Controller
     {
-        private readonly IUserService userService;
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IUserService _userService;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(IUserService userService , RoleManager<IdentityRole> roleManager)
+        public AdminController(IUserService _userService , RoleManager<IdentityRole> _roleManager)
         {
-            this.userService = userService;
-            this.roleManager = roleManager;
+            this._userService = _userService;
+            this._roleManager = _roleManager;
         }
         [HttpGet]
         [Authorize]
@@ -30,34 +30,32 @@ namespace Restaurant.areas.Identity.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> AddRole(RoleDto roleDto)
         {
             if (ModelState.IsValid)
             {
-                var result = await userService.CreateRoleAsync(roleDto);
+                var result = await _userService.CreateRoleAsync(roleDto);
                 if (result.Succeeded)
                 {
                     TempData["SuccessMessage"] = $"Role '{roleDto.roleName}' created successfully.";
-                    return RedirectToAction("GetAllRoles");
+                    return RedirectToAction(nameof(GetAllRoles));
                 }
                 foreach(var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-            return View("AddRole", roleDto);
+            return View(nameof(AddRole), roleDto);
         }
 
         public async Task<IActionResult> GetAllRoles()
         {
-            var roles = await userService.GetAllRolesAsync();
+            var roles = await _userService.GetAllRolesAsync();
             return View(roles);
         }
 
         [HttpGet]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignRole()
         {
-            var roles = await roleManager.Roles
+            var roles = await _roleManager.Roles
                 .Select(r => new SelectListItem { Value = r.Name, Text = r.Name })
                 .ToListAsync();
 
@@ -70,27 +68,28 @@ namespace Restaurant.areas.Identity.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignRole(AssignRoleDto model)
         {
             if (!ModelState.IsValid)
             {
-                model.Roles = await roleManager.Roles
+                model.Roles = await _roleManager.Roles
                     .Select(r => new SelectListItem { Value = r.Name, Text = r.Name })
                     .ToListAsync();
                 return View(model);
             }
 
             var loginDto = new LoginDto { userName = model.UserNameOrEmail };
-            var result = await userService.AddToRoleAsync(loginDto, model.RoleName);
+            var result = await _userService.AddToRoleAsync(loginDto, model.RoleName);
 
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = $"User '{model.UserNameOrEmail}' added to role '{model.RoleName}' successfully.";
-                return RedirectToAction("AssignRole");
+                return RedirectToAction(nameof(AssignRole));
             }
 
             TempData["ErrorMessage"] = string.Join(" | ", result.Errors.Select(e => e.Description));
-            model.Roles = await roleManager.Roles
+            model.Roles = await _roleManager.Roles
                 .Select(r => new SelectListItem { Value = r.Name, Text = r.Name })
                 .ToListAsync();
 

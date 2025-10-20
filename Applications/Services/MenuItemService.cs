@@ -6,17 +6,15 @@ namespace Applications.Services
 {
     public class MenuItemService : IMenuItemService
     {
-        private readonly IGenericRepository<MenuItem> itemRepo;
+        private readonly IGenericRepository<MenuItem> _itemRepo;
 
-        //private readonly IMenuItemRepository itemRepo;
-
-        public MenuItemService(IGenericRepository<MenuItem> itemRepo)
+        public MenuItemService(IGenericRepository<MenuItem> _itemRepo)
         {
-            this.itemRepo = itemRepo;
+            this._itemRepo = _itemRepo;
         }
         public async Task<List<ItemsDto>> GetAll()
         {
-            var items = await itemRepo.GetAll(c => c.Category);
+            var items = await _itemRepo.GetAll(c => c.Category);
             var itemDto = items.Select(item => new ItemsDto
             {
                 Id = item.Id,
@@ -37,7 +35,7 @@ namespace Applications.Services
         }
         public async Task<ItemsDto?> GetById(int id)
         {
-            var menuItem = await itemRepo.GetById(id,c=>c.Category);
+            var menuItem = await _itemRepo.GetById(id,c=>c.Category);
             if (menuItem == null) return null;
             return new ItemsDto
             {
@@ -55,21 +53,38 @@ namespace Applications.Services
                 },
             };
         }
-        //public async Task<ItemsDto> GetByName(string name)
-        //{
-        //    var item = await itemRepo.GetByName(name);
-        //    if (item == null) return null;
-        //    var itemDto = new ItemsDto
-        //    {
-        //        Name = item.Name
-        //    };
 
-        //    return itemDto;
-        //}
+        public async Task<ItemsDto?> GetItemByName(string name)
+        {
+            var menuItem = await _itemRepo.GetName(name, i => i.Category);
+
+            if (menuItem == null)
+                return null;
+
+            var itemDto = new ItemsDto()
+            {
+                Id = menuItem.Id,
+                Name = menuItem.Name,
+                Description = menuItem.Description,
+                Price = menuItem.Price,
+                Quantity = menuItem.Quantity,
+                ImageUrl = menuItem.ImageUrl,
+                CategoryId = menuItem.CategoryId,
+                Category = menuItem.Category == null
+                    ? null
+                    : new CategoryDto
+                    {
+                        Id = menuItem.Category.Id,
+                        Name = menuItem.Category.Name
+                    }
+            };
+            return itemDto;
+        }
+
 
         public async Task<bool> GetByName(string name)
         {
-            var item = await itemRepo.GetByName(name);
+            var item = await _itemRepo.GetByName(name);
             if (item == null)
             {
                 return false;
@@ -91,12 +106,12 @@ namespace Applications.Services
                 ImageUrl = newItem.ImageUrl,
                 CategoryId = newItem.CategoryId
             };
-            await itemRepo.Create(menuitem);
-            await itemRepo.Save();
+            await _itemRepo.Create(menuitem);
+            await _itemRepo.Save();
         }
         public async Task Update(ItemsDto newItem)
         {
-            var item = await itemRepo.GetById(newItem.Id);
+            var item = await _itemRepo.GetById(newItem.Id);
             if (item == null)
             {
                 return;
@@ -108,18 +123,18 @@ namespace Applications.Services
             item.ImageUrl = newItem.ImageUrl; 
             item.CategoryId = newItem.CategoryId;
 
-            await itemRepo.Update(item);
-            await itemRepo.Save();
+            await _itemRepo.Update(item);
+            await _itemRepo.Save();
         }
         public async Task Delete(int id)
         {
-            var item = await itemRepo.GetById(id);
+            var item = await _itemRepo.GetById(id);
             if (item == null)
             {
                 return;
             }
-            await itemRepo.Delete(id);
-            await itemRepo.Save();
+            await _itemRepo.Delete(id);
+            await _itemRepo.Save();
         }
     }
 }

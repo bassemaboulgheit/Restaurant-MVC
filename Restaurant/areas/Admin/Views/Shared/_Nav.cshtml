@@ -1,6 +1,12 @@
-﻿<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+﻿@using Applications.Services
+@inject ICategoryService categoryService
+
+@{
+    var categories = await categoryService.GetAll();
+}
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MazaQ</a>
+        <a class="navbar-brand" asp-area="Admin" asp-controller="Home" asp-action="Index">MazaQ</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,12 +16,34 @@
                     <a class="nav-link" asp-area="Identity" asp-controller="Home" asp-action="Index">
                         Home
                     </a>*@
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="Identity" asp-controller="Category" asp-action="GetAll">Categories</a>
+                @* <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Category" asp-action="GetAll">Categories</a>
+                </li> *@
+                <!-- Dropdown Categories -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Categories
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        @foreach (var category in categories)
+                        {
+                            <li>
+                                <a class="dropdown-item"
+                                   asp-area="Admin"
+                                   asp-controller="Category"
+                                   asp-action="Details"
+                                   asp-route-Id="@category.Id">
+                                    @category.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="Identity" asp-controller="MenuItem" asp-action="GetAll">Menu Items</a>
+                    <a class="nav-link" asp-area="Admin" asp-controller="MenuItem" asp-action="GetAll">Menu Items</a>
                 </li>
+
 
                 @* Authentication Links *@
                 @if (User.Identity.IsAuthenticated)
@@ -39,25 +67,26 @@
                     </li>
 
                     @* Admin Links *@
-                    @if (User.IsInRole("Admin"))
-                    {
+                    @* @if (User.IsInRole("Admin")) *@
+                    @* { *@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                 Admin
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="Admin" asp-action="AddRole">Add Roles</a>
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="Admin" asp-action="AssignRole">Assign Roles</a>
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="Admin" asp-action="GetAllRoles">Get All Roles</a>
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="Order" asp-action="Index">All Orders</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Admin" asp-action="AddRole">Add Roles</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Admin" asp-action="AssignRole">Assign Roles</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Admin" asp-action="GetAllRoles">Get All Roles</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Order" asp-action="Index">All Orders</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="Category" asp-action="Create">Add Category</a>
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="MenuItem" asp-action="Create">Add Menu Item</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Create">Add Category</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="MenuItem" asp-action="Create">Add Menu Item</a>
                             </div>
                         </li>
-                    }
+                    @* } *@
                 }
-                else
+                @* else *@
+                @if (!User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item">
                         <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">Register</a>

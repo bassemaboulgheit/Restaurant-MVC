@@ -1,6 +1,8 @@
 ﻿@model ItemsDto
 @{
     ViewData["Title"] = "Edit";
+	Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+
      SelectList Categories =  new SelectList(ViewBag.categories, "Id", "Name");
 }
 
@@ -45,7 +47,7 @@
     
     <div class="form-group mt-3">
         <input type="submit" value="Save" class="btn btn-primary" />
-        <a asp-action="GetAll" class="btn btn-secondary">Back to List</a>
+        <a asp-controller="MenuItem" asp-action="GetAll" class="btn btn-secondary">Back to List</a>
     </div>
 </form>
 @section Scripts {

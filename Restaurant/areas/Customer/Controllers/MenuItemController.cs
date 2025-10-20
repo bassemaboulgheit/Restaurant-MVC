@@ -9,26 +9,46 @@ namespace Restaurant.areas.Customer.Controllers
 {
     //[Authorize]
     [Area(nameof(Customer))]
+    //[Authorize(Roles = nameof(Customer))]
     public class MenuItemController : Controller
     {
-        private readonly IMenuItemService itemService;
-        private readonly ICategoryService categoryService;
+        private readonly IMenuItemService _itemService;
+        private readonly ICategoryService _categoryService;
 
-        public MenuItemController(IMenuItemService itemService, ICategoryService categoryService)
+        public MenuItemController(IMenuItemService _itemService, ICategoryService _categoryService)
         {
-            this.itemService = itemService;
-            this.categoryService = categoryService;
+            this._itemService = _itemService;
+            this._categoryService = _categoryService;
         }
         public async Task<IActionResult> GetAll()
         {
-            var items = await itemService.GetAll();
+            var items = await _itemService.GetAll();
             return View(items);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var item = await itemService.GetById(id);
+            var item = await _itemService.GetById(id);
             return View(item);
         }
+
+        public async Task<IActionResult> Search(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Message"] = "Please enter a valid item name.";
+                return RedirectToAction(nameof(GetAll));
+            }
+            var item = await _itemService.GetItemByName(name);
+
+            if (item != null)
+            {
+                return View("Details", item);
+            }
+            TempData["Message"] = "No item found with that name.";
+            return RedirectToAction(nameof(GetAll));
+        }
+
+
     }
 }

@@ -12,18 +12,18 @@ namespace Infrastructure.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
-        private readonly RestaurantDb context;
-        DbSet<T> dbSet;
-        public GenericRepository(RestaurantDb context)
+        private readonly RestaurantDb _context;
+        DbSet<T> _dbSet;
+        public GenericRepository(RestaurantDb _context)
         {
-            this.context = context;
-            dbSet = context.Set<T>();
+            this._context = _context;
+            _dbSet = _context.Set<T>();
         }
 
-        public async Task<List<T>> GetAll( Expression<Func<T, object>>[]? includes = null)
+        public async Task<IQueryable<T>> GetAll( Expression<Func<T, object>>[]? includes = null)
         //public async Task<IQueryable<T>> Get(Expression<Func<T, bool>>? filter = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true)
         {
-            IQueryable<T> query = dbSet;
+            IQueryable<T> query = _dbSet;
             //if (filter != null)
             //{ query = query.Where(filter); }
 
@@ -40,12 +40,12 @@ namespace Infrastructure.Repository
             //}
             //return  query;
 
-            return  await  query.ToListAsync();
+            return  query;
         }
 
-        public async Task<T?> GetById(int id , params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetById(int id , params Expression<Func<T, object>>[] includes)   
         {
-            IQueryable<T> query = dbSet;
+            IQueryable<T> query = _dbSet;
             if (includes != null)
             {
                 foreach (var include in includes)
@@ -55,43 +55,68 @@ namespace Infrastructure.Repository
             }
             return await query.FirstOrDefaultAsync(e => e.Id == id);
         }
-        public async Task<bool> GetByName(string name)
+
+
+        public async Task<bool> GetByName(string name , params Expression<Func<T, object>>[] includes)
         {
-            //return await dbSet.FirstOrDefaultAsync(e => EF.Property<string>(e, "Name").Contains(name));
-            return await dbSet.AnyAsync(e => EF.Property<string>(e, "Name").Contains(name));
+            return await _dbSet.AnyAsync(e => EF.Property<string>(e, "Name").Contains(name));
         }
-        public async Task<List<T>> GetListByName(string name)
+
+
+        public async Task<List<T>> GetListByName(string name, params Expression<Func<T, object>>[] includes)
         {
-            return await dbSet.Where(e => EF.Property<string>(e, "Name").Contains(name)).ToListAsync();
+            return await _dbSet.Where(e => EF.Property<string>(e, "Name").Contains(name)).ToListAsync();
+        }
+
+
+        public async Task<T?> GetName(string name, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet.AsQueryable();
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query
+                    .AsQueryable()
+                    .FirstOrDefaultAsync(e =>
+                        (EF.Property<string>(e, "Name") ?? string.Empty)
+                            .ToLower()
+                            .Contains(name.ToLower())
+                    );
         }
 
         public async Task Create(T entity)
         {
-            await dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity);
         }
 
         public async Task Update(T entity)
         {
-            dbSet.Update(entity);
+            _dbSet.Update(entity);
         }
 
         public async Task Delete(int id)
         {
-            var entity = await dbSet.FindAsync(id);
+            var entity = await _dbSet.FindAsync(id);
             if (entity != null)
             {
                 entity.IsDeleted = true;
-                dbSet.Update(entity);
+                _dbSet.Update(entity);
             }
         }
 
         public async Task<bool> Restor(int id)
         {
-            var entity = await dbSet.FindAsync(id);
+            var entity = await _dbSet.FindAsync(id);
             if (entity != null && entity.IsDeleted)
             {
                 entity.IsDeleted = false;
-                dbSet.Update(entity);
+                _dbSet.Update(entity);
                 return true;
             }
             return false;
@@ -99,12 +124,12 @@ namespace Infrastructure.Repository
 
         public async Task<List<T>> GetAllDeleted()
         {
-             return await dbSet.IgnoreQueryFilters().ToListAsync();
+             return await _dbSet.IgnoreQueryFilters().ToListAsync();
         }
 
         public async Task Save()
         {
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

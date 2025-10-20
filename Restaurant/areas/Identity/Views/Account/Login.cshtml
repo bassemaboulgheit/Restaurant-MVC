@@ -3,36 +3,44 @@
     ViewData["Title"] = "Login";
 }
 
-<h1>Login</h1>
-
-<div class="row">
-    <div class="col-md-4">
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4 rounded-4" style="width: 380px;">
+        <h3 class="text-center mb-4 text-primary fw-bold">Welcome Back 👋</h3>
         <form asp-action="Login" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class=" form-group">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="userName" class="form-control" placeholder="Username or Email" />
                 <label asp-for="userName"></label>
-                <input asp-for="userName" class="form-control" />
-                <span asp-validation-for="userName" class="text-danger"></span>
+                <span asp-validation-for="userName" class="text-danger small"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-floating mb-3">
+                <input asp-for="Password" class="form-control" type="password" placeholder="Password" />
                 <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="RememberMe" /> @*@Html.d *@
-                </label>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="RememberMe" />
+                <label class="form-check-label" asp-for="RememberMe"></label>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Login" class="btn btn-primary" />
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary btn-lg rounded-3">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                </button>
+            </div>
+
+            <div class="text-center">
+                <a asp-action="Register" class="text-decoration-none">
+                    <i class="bi bi-person-plus"></i> Create a new account
+                </a>
             </div>
         </form>
     </div>
 </div>
-<div>
-    <a asp-action="Register">Create User</a>
-</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

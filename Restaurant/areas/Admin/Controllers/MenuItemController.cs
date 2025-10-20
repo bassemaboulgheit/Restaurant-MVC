@@ -7,33 +7,33 @@ using Models;
 
 namespace Restaurant.areas.Admin.Controllers
 {
-    [Authorize]
+    [Authorize(Roles =nameof(Admin))]
     [Area(nameof(Admin))]
     public class MenuItemController : Controller
     {
-        private readonly IMenuItemService itemService;
-        private readonly ICategoryService categoryService;
+        private readonly IMenuItemService _itemService;
+        private readonly ICategoryService _categoryService;
 
-        public MenuItemController(IMenuItemService itemService, ICategoryService categoryService)
+        public MenuItemController(IMenuItemService _itemService, ICategoryService _categoryService)
         {
-            this.itemService = itemService;
-            this.categoryService = categoryService;
+            this._itemService = _itemService;
+            this._categoryService = _categoryService;
         }
         public async Task<IActionResult> GetAll()
         {
-            var items = await itemService.GetAll();
+            var items = await _itemService.GetAll();
             return View(items);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var item = await itemService.GetById(id);
+            var item = await _itemService.GetById(id);
             return View(item);
         }
 
         public async Task<IActionResult> Create()
         {
-            ViewBag.categories = await categoryService.GetAll();
+            ViewBag.categories = await _categoryService.GetAll();
             return View();
         }
 
@@ -44,17 +44,17 @@ namespace Restaurant.areas.Admin.Controllers
             {
                 return View(newItem);
             }
-            await itemService.Create(newItem);
-            return RedirectToAction("GetAll");
+            await _itemService.Create(newItem);
+            return RedirectToAction(nameof(GetAll));
         }
         public async Task<IActionResult> Edit(int id)
         {
-            var item = await itemService.GetById(id);
+            var item = await _itemService.GetById(id);
             if (item == null)
             {
                 return NotFound();
             }
-            ViewBag.categories = await categoryService.GetAll();
+            ViewBag.categories = await _categoryService.GetAll();
             return View(item);
         }
 
@@ -64,27 +64,43 @@ namespace Restaurant.areas.Admin.Controllers
             if (ModelState.IsValid)
             {
 
-                var item = await itemService.GetById(updatedItem.Id);
+                var item = await _itemService.GetById(updatedItem.Id);
                 if (item == null)
                 {
                     return NotFound();
                 }
-                await itemService.Update(updatedItem);
-                return RedirectToAction("GetAll");
+                await _itemService.Update(updatedItem);
+                return RedirectToAction(nameof(GetAll));
             }
-            ViewBag.categories = await categoryService.GetAll();
+            ViewBag.categories = await _categoryService.GetAll();
             return View(updatedItem);
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await itemService.GetById(id);
+            var item = await _itemService.GetById(id);
             if (item == null)
             {
                 return NotFound();
             }
-            await itemService.Delete(id);
-            return RedirectToAction("GetAll");
+            await _itemService.Delete(id);
+            return RedirectToAction(nameof(GetAll));
+        }
+        public async Task<IActionResult> Search(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Message"] = "Please enter a valid item name.";
+                return RedirectToAction(nameof(GetAll));
+            }
+            var item = await _itemService.GetItemByName(name);
+
+            if (item != null)
+            {
+                return View("Details", item);
+            }
+            TempData["Message"] = "No item found with that name.";
+            return RedirectToAction(nameof(GetAll));
         }
 
     }

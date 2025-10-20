@@ -13,6 +13,7 @@ namespace Applications.Services
         public Task<List<CategoryDto>> GetAll();
         public Task<CategoryDto?> GetById(int id);
         //public Task<CategoryDto?> GetByName(string name);
+        public Task<CategoryDto> GetCategoryByName(string name);
         public Task<bool> GetByName(string name);
         public Task Create(CategoryDto menuCategory);
         public Task Update(CategoryDto menuCategory);

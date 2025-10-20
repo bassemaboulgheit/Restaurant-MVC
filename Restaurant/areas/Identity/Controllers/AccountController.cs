@@ -11,11 +11,11 @@ namespace Restaurant.areas.Identity.Controllers
     [Area(nameof(Identity))]
     public class AccountController : Controller
     {
-        private readonly IUserService userService;
+        private readonly IUserService _userService;
 
-        public AccountController(IUserService userService)
+        public AccountController(IUserService _userService)
         {
-            this.userService = userService;
+            this._userService = _userService;
         }
         public IActionResult Register()
         {
@@ -34,7 +34,7 @@ namespace Restaurant.areas.Identity.Controllers
                     return View(userDto);
                 }
 
-                var result = await userService.CreateAsync(userDto);
+                var result = await _userService.CreateAsync(userDto);
                 if (result.Succeeded)
                 {
                     TempData["SuccessMessage"] = "Registration completed successfully. Please log in";
@@ -58,13 +58,21 @@ namespace Restaurant.areas.Identity.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await userService.SignInAsync(userDto);
+                var result = await _userService.SignInAsync(userDto);
 
                 if (result.Succeeded)
-                    //var roles = userService.GetAllRolesAsync(); 
+                {
+                    var roles = await _userService.GetAllRolesAsync();
+                    if (User.IsInRole(nameof(Admin)))
+                        return RedirectToAction("GetAll", "MenuItem", new { area = nameof(Admin) });
 
-                 return RedirectToAction("GetAll", "MenuItem");
-                //return RedirectToAction(nameof(MenuItemController.GetAll));
+                    else if (User.IsInRole(nameof(Customer)))
+                        return RedirectToAction("GetAll", "MenuItem", new { area = nameof(Customer) });
+                    else
+                        return RedirectToAction("GetAll", "MenuItem", new { area = nameof(Identity) });
+
+                    //return RedirectToAction("GetAll", "MenuItem");
+                }
 
                 if (result.IsLockedOut)
                     ModelState.AddModelError("", "Account locked. Try again later.");
@@ -76,7 +84,7 @@ namespace Restaurant.areas.Identity.Controllers
         }
         public async Task<IActionResult> SignOut()
         {
-            await userService.SignOutAsync();
+            await _userService.SignOutAsync();
             return RedirectToAction(nameof(Login));
         }
     }

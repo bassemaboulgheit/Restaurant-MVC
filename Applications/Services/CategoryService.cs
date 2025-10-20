@@ -1,25 +1,26 @@
 ﻿using System.Threading.Tasks;
 using Applications.Contracts;
 using Applications.DTos;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace Applications.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly IGenericRepository<Category> categoryRepo;
+        private readonly IGenericRepository<Category> _categoryRepo;
 
         //private readonly IMenuCategoryRepository categoryRepo;
 
-        public CategoryService(IGenericRepository<Category> categoryRepo)
+        public CategoryService(IGenericRepository<Category> _categoryRepo)
         {
-            this.categoryRepo = categoryRepo;
+            this._categoryRepo = _categoryRepo;
         }
 
         public async Task<List<CategoryDto>> GetAll()
         {
-            var categories = await categoryRepo.GetAll();
-            //var categories = await categoryRepo.Get();
+            var query = await _categoryRepo.GetAll(i=>i.MenuItems);
+            var categories = await query.ToListAsync();
             var categoryDtos = categories.Select(category => new CategoryDto
             {
                 Id = category.Id,
@@ -39,11 +40,34 @@ namespace Applications.Services
         }
         public async Task<CategoryDto?> GetById(int id)
         {
-            var menuCategory = await categoryRepo.GetById(id, i => i.MenuItems);
+            var menuCategory = await _categoryRepo.GetById(id, i => i.MenuItems);
             if (menuCategory == null)
             {
                 return null;
             }
+            var categoryDto = new CategoryDto()
+            {
+                Id = menuCategory.Id,
+                Name = menuCategory.Name,
+                Description = menuCategory.Description,
+                Items = menuCategory.MenuItems?.Select(item => new ItemsDto
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    Price = item.Price,
+                    Quantity = item.Quantity,
+                    ImageUrl = item.ImageUrl,
+                    CategoryId = item.CategoryId
+                }).ToList() ?? new List<ItemsDto>()
+            };
+            return categoryDto;
+        }
+        public async Task<CategoryDto?> GetCategoryByName(string name)
+        {
+            var menuCategory = await _categoryRepo.GetName(name, c => c.MenuItems);
+            if (menuCategory == null)
+                return null;
             var categoryDto = new CategoryDto()
             {
                 Id = menuCategory.Id,
@@ -61,18 +85,7 @@ namespace Applications.Services
             };
             return categoryDto;
         }
-        //public async Task<CategoryDto> GetByName(string name)
-        //{
-        //    var menuCategory = await categoryRepo.GetByName(name);
-        //    if (menuCategory == null) {
-        //        return null;
-        //    }
-        //    var categoryDto = new CategoryDto()
-        //        {
-        //        Name = menuCategory.Name
-        //    };
-        //    return categoryDto;
-        //}
+
         public async Task Create(CategoryDto newCategory)
         {
             if (newCategory == null)
@@ -84,40 +97,40 @@ namespace Applications.Services
                 Name = newCategory.Name,
                 Description = newCategory.Description,
             };
-            await categoryRepo.Create(category);
-            await categoryRepo.Save();
+            await _categoryRepo.Create(category);
+            await _categoryRepo.Save();
         }
         public async Task Update(CategoryDto newCategory)
         {
-            var category = await categoryRepo.GetById(newCategory.Id);
+            var category = await _categoryRepo.GetById(newCategory.Id);
             if (category == null)
             {
                 return;
             }
             category.Name = newCategory.Name;
             category.Description = newCategory.Description;
-            await categoryRepo.Update(category);
-            await categoryRepo.Save();
+            await _categoryRepo.Update(category);
+            await _categoryRepo.Save();
         }
         public async Task Delete(int id)
         {
-            var category = await categoryRepo.GetById(id);
+            var category = await _categoryRepo.GetById(id);
             if (category == null)
             {
                 return;
             }
-            await categoryRepo.Delete(id);
-            await categoryRepo.Save();
+            await _categoryRepo.Delete(id);
+            await _categoryRepo.Save();
         }
 
         public async Task<bool> GetByName(string name)
         {
-            var category = await categoryRepo.GetByName(name);
-            if (category == null)
+            var category = await _categoryRepo.GetByName(name);
+            if (category)
             {
-                return false;
+                return category;
             }
-            return  category;
+            return false;
         }
     }
 }

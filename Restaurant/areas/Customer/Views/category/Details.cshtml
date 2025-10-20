@@ -1,44 +1,182 @@
 ﻿@model CategoryDto
-
 @{
     ViewData["Title"] = "Category Details";
+    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
+    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
 }
 
-<div class="container mt-4">
-    <h2 class="text-primary mb-4">Category Details</h2>
+<div class="container mt-5 mb-5">
+    <!-- Category Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary fw-bold">@Model.Name</h1>
+        <p class="lead text-muted">@Model.Description</p>
+        <hr class="w-50 mx-auto">
+    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label fw-bold">Category Name:</label>
-                <input class="form-control" value="@Model.Name" readonly />
-            </div>
+    <!-- Items Grid -->
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model.Items)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 hover-card">
+                        <!-- Image -->
+                        <div class="position-relative">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name"
+                                     style="height: 250px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center"
+                                     style="height: 250px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                                </div>
+                            }
 
-            <div class="mb-3">
-                <label class="form-label fw-bold">Description:</label>
-                <input class="form-control" value="@Model.Description" readonly />
-            </div>
+                            <!-- Stock Badge -->
+                            <span class="position-absolute top-0 end-0 m-3 badge @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
+                                @(item.Quantity > 0 ? "In Stock" : "Out of Stock")
+                            </span>
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-bold">Menu Items:</label>
-                @if (Model.Items != null && Model.Items.Any())
-                {
-                    <ul class="list-group">
-                        @foreach (var item in Model.Items)
-                        {
-                            <li class="list-group-item">@item.Name</li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-muted fst-italic">No menu items found for this category.</p>
-                }
-            </div>
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark">@item.Name</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                @if (!string.IsNullOrEmpty(item.Description))
+                                {
+                                    @(item.Description.Length > 80 ? item.Description.Substring(0, 80) + "..." : item.Description)
+                                }
+                                else
+                                {
+                                    <span class="fst-italic">No description available</span>
+                                }
+                            </p>
 
-            <div class="text-center mt-4">
-                <a asp-action="GetAll" class="btn btn-secondary px-4">Back to List</a>
-            </div>
+                            <!-- Price -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="text-success mb-0 fw-bold">
+                                    @item.Price.ToString("C")
+                                </h4>
+                                @if (item.Quantity > 0)
+                                {
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-seam me-1"></i>@item.Quantity units
+                                    </small>
+                                }
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                @if (item.Quantity > 0)
+                                {
+                                    @if (isAuthenticated)
+                                    {
+                                        <form asp-controller="Order" asp-action="AddToOrder" method="post" class="d-inline">
+                                            <input type="hidden" name="itemId" value="@item.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-success w-100">
+                                                <i class="bi bi-cart-plus me-2"></i>Add to Order
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-area="" asp-controller="Account" asp-action="Login"
+                                           asp-route-returnUrl="@Context.Request.Path"
+                                           class="btn btn-primary">
+                                            <i class="bi bi-box-arrow-in-right me-2"></i>Login to Order
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary" disabled>
+                                        <i class="bi bi-x-circle me-2"></i>Out of Stock
+                                    </button>
+                                }
+                                <a asp-controller="MenuItem" asp-action="Details" asp-route-id="@item.Id"
+                                   class="btn btn-outline-primary">
+                                    <i class="bi bi-info-circle me-2"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
+    }
+    else
+    {
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-inbox text-muted" style="font-size: 5rem;"></i>
+            </div>
+            <h3 class="text-muted">No Items Available</h3>
+            <p class="text-muted">This category doesn't have any menu items yet.</p>
+        </div>
+    }
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+        <a asp-controller="MenuItem" asp-action="GetAll" class="btn btn-secondary btn-lg px-5">
+            <i class="bi bi-arrow-left me-2"></i>Back to Categories
+        </a>
     </div>
 </div>
+
+<!-- Custom CSS -->
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+
+    .card-img-top {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .display-4 {
+        animation: fadeInDown 0.6s ease-in;
+    }
+
+    .card {
+        animation: fadeInUp 0.6s ease-in;
+    }
+
+    @@keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

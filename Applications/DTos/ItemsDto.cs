@@ -45,8 +45,8 @@ namespace Applications.DTos
 
         [Display(Name = "Daily Order Count")]
 
-        public CategoryDto Category { get; set; } 
+        public CategoryDto? Category { get; set; } 
 
-        public List<OrderItemsDto> OrderItems { get; set; } = new List<OrderItemsDto>();
+        public List<OrderItemsDto?> OrderItems { get; set; } = new List<OrderItemsDto>();
     }
 }

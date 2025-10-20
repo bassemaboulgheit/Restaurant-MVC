@@ -33,10 +33,7 @@ namespace Restaurant
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
 
-                // Claims
-                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
-                options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
-                options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+                
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<RestaurantDb>();
@@ -67,8 +64,9 @@ namespace Restaurant
                 name: "default",
                 //pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
-            //pattern: "{area=Customer}/{controller=MenuItem}/{action=getAll}/{id?}");
+                //pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
+
+            pattern: "{area=Customer}/{controller=MenuItem}/{action=getAll}/{id?}");
 
             app.Run();
         }

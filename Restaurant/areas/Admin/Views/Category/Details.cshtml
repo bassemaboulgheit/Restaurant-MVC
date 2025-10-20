@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Category Details";
+	Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
 }
 
 <div class="container mt-4">
@@ -37,7 +38,8 @@
             </div>
 
             <div class="text-center mt-4">
-                <a asp-action="GetAll" class="btn btn-secondary px-4">Back to List</a>
+                @* <a  asp-action="GetAll" class="btn btn-secondary px-4">Back to List</a> *@
+                <a asp-area="Admin" asp-controller="MenuItem" asp-action="GetAll" class="btn btn-secondary px-4">Back to List</a>
             </div>
         </div>
     </div>
