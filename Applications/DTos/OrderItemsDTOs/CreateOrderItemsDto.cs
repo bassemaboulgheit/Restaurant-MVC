@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Models;
 
-namespace Applications.DTos
+namespace Applications.DTos.OrderItemsDTOs
 {
-    public class OrderItemsDto
+    public class CreateOrderItemsDto
     {
-        public int Id { get; set; }
-
 
         [Required(ErrorMessage = "Quantity is required")]
         [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100")]
@@ -28,7 +21,7 @@ namespace Applications.DTos
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Subtotal")]
         [DataType(DataType.Currency)]
-        public decimal Subtotal { get; set; } 
+        public decimal Subtotal { get; set; }
 
         [Required]
         [Display(Name = "Order")]

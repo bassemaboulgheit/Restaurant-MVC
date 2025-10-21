@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Applications.DTos;
+using Applications.DTos.AdminDTOs;
+using Applications.DTos.UsersDTo;
 using Microsoft.AspNetCore.Identity;
 using Models;
 

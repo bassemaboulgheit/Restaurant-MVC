@@ -1,4 +1,4 @@
-﻿using Applications.DTos;
+﻿using Applications.DTos.CategoryDTOs;
 using Applications.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +52,7 @@ namespace Restaurant.areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryDto newCategory)
+        public async Task<IActionResult> Create(CreateCategoryDto newCategory)
         {
             if (!ModelState.IsValid)
             {

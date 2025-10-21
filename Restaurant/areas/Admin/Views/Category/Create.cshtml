@@ -1,42 +1,293 @@
-﻿@model CategoryDto
+﻿@using Applications.DTos.CategoryDTOs
+@model CategoryDto
 @{
-    ViewData["Title"] = "Create";
-	Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+    ViewData["Title"] = "Create Category";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0 text-center">Create Category</h4>
+<style>
+    .create-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+        .page-title h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 14px;
+        }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        padding: 25px;
+        color: white;
+    }
+
+        .form-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .form-body {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 14px;
+        display: block;
+    }
+
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+            outline: none;
+        }
+
+    textarea.form-control {
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .validation-summary {
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #d32f2f;
+        font-size: 14px;
+    }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .validation-summary li {
+            margin-bottom: 5px;
+        }
+
+    .text-danger {
+        display: block;
+        color: #d32f2f;
+        font-size: 13px;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+
+    .form-control.is-invalid {
+        border-color: #d32f2f;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .btn-action {
+        padding: 11px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .btn-submit {
+        background: #2563eb;
+        color: white;
+    }
+
+        .btn-submit:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+    .btn-back {
+        background: #f0f0f0;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            color: #333;
+        }
+
+    .character-count {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+    }
+
+    @@media (max-width: 576px) {
+        .create-container {
+            margin: 20px 15px;
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .page-title h2 {
+            font-size: 22px;
+        }
+
+        .btn-action {
+            flex: 1 !important;
+        }
+    }
+</style>
+
+<div class="create-container">
+    <!-- Page Title -->
+    <div class="page-title">
+        <h2>
+            <i class="bi bi-plus-circle"></i> Create New Category
+        </h2>
+        <p>Add a new product category to your system</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <!-- Header -->
+        <div class="form-header">
+            <h4>
+                <i class="bi bi-pencil-square"></i> Category Details
+            </h4>
         </div>
-        <div class="card-body">
-            <form asp-controller="Category" asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+        <!-- Body -->
+        <div class="form-body">
+            <form asp-controller="Category" asp-action="Create" method="post" novalidate>
+                <!-- Validation Summary -->
+                @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+                {
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                }
+
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label asp-for="Name" class="form-label">
+                        <i class="bi bi-tag"></i> Category Name <span style="color: #d32f2f;">*</span>
+                    </label>
+                    <input asp-for="Name"
+                           type="text"
+                           class="form-control"
+                           placeholder="Enter category name"
+                           maxlength="100"
+                           required />
                     <span asp-validation-for="Name" class="text-danger"></span>
+                    <div class="character-count">
+                        <span id="nameCount">0</span>/100 characters
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label"></label>
-                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                <!-- Description Field -->
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label">
+                        <i class="bi bi-file-text"></i> Description
+                    </label>
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter category description (optional)"
+                              maxlength="500"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
+                    <div class="character-count">
+                        <span id="descCount">0</span>/500 characters
+                    </div>
                 </div>
 
-                <div class="text-center mt-4">
-                    <a asp-action="GetAll" class="btn btn-secondary me-2">
-                        <i class="bi bi-arrow-left-circle"></i> Back to List
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <a asp-action="GetAll" class="btn-action btn-back">
+                        <i class="bi bi-arrow-left"></i> Back to List
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Create
+                    <button type="submit" class="btn-action btn-submit">
+                        <i class="bi bi-check-circle"></i> Create Category
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    // Character counter for Name
+    var nameInput = document.getElementById('Name');
+    if (nameInput) {
+        nameInput.addEventListener('input', function() {
+            document.getElementById('nameCount').textContent = this.value.length;
+        });
+        // Initialize count on page load
+        document.getElementById('nameCount').textContent = nameInput.value.length;
+    }
+
+    // Character counter for Description
+    var descInput = document.getElementById('Description');
+    if (descInput) {
+        descInput.addEventListener('input', function() {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+        // Initialize count on page load
+        document.getElementById('descCount').textContent = descInput.value.length;
+    }
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

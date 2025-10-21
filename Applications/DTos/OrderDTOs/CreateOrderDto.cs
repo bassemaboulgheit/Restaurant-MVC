@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Models;
 
-namespace Applications.DTos
+namespace Applications.DTos.OrderDTOs
 {
-    public class OrderDto
+    public class CreateOrderDto
     {
-        public int Id { get; set; }
-
 
         [Required(ErrorMessage = "Order type is required")]
         [Display(Name = "Order Type")]
@@ -60,9 +53,6 @@ namespace Applications.DTos
 
         public int TotalPreparationTime { get; set; }
 
-        [ForeignKey("user")]
-        public string? userId { get; set; }
-        public List<OrderItemsDto>? OrderItems { get; set; } 
-        public LoginDto? user { get; set; }
+        
     }
 }

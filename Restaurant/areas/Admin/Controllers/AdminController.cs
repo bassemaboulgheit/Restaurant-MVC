@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Applications.DTos;
+using Applications.DTos.AdminDTOs;
+using Applications.DTos.UsersDTo;
 using Applications.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

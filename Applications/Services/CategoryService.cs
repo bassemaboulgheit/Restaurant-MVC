@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Applications.Contracts;
-using Applications.DTos;
+using Applications.DTos.CategoryDTOs;
+using Applications.DTos.ItemDTOs;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
@@ -86,7 +87,7 @@ namespace Applications.Services
             return categoryDto;
         }
 
-        public async Task Create(CategoryDto newCategory)
+        public async Task Create(CreateCategoryDto newCategory)
         {
             if (newCategory == null)
             {

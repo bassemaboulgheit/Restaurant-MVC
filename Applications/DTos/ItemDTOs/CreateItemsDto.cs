@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Models;
 
-namespace Applications.DTos
+namespace Applications.DTos.ItemDTOs
 {
-    public class ItemsDto
+    public class CreateItemsDto
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "Item name is required")]
         [MinLength(3, ErrorMessage = "Item name must be at least 3 characters long")]
@@ -43,10 +36,5 @@ namespace Applications.DTos
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
 
-        [Display(Name = "Daily Order Count")]
-
-        public CategoryDto? Category { get; set; } 
-
-        public List<OrderItemsDto?> OrderItems { get; set; } = new List<OrderItemsDto>();
     }
 }

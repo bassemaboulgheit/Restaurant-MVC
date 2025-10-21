@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Applications.Contracts;
 using Applications.DTos;
+using Applications.DTos.OrderDTOs;
+using Applications.DTos.OrderItemsDTOs;
 using Models;
 
 namespace Applications.Services

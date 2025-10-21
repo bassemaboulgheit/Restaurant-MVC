@@ -1,5 +1,6 @@
 ﻿using Applications.Contracts;
-using Applications.DTos;
+using Applications.DTos.CategoryDTOs;
+using Applications.DTos.ItemDTOs;
 using Models;
 
 namespace Applications.Services
@@ -91,7 +92,7 @@ namespace Applications.Services
             }
             return  item;
         }
-        public async Task Create(ItemsDto newItem)
+        public async Task Create(CreateItemsDto newItem)
         {
             if (newItem == null)
             {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applications.DTos
+namespace Applications.DTos.AdminDTOs
 {
     public class RoleDto
     {

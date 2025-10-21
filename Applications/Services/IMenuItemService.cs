@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Applications.DTos;
+using Applications.DTos.ItemDTOs;
 using Models;
 
 namespace Applications.Services
@@ -14,7 +14,7 @@ namespace Applications.Services
         public Task<ItemsDto?> GetById(int id);
         //public Task<ItemsDto> GetByName(string name);
         public Task<ItemsDto?> GetItemByName(string name);
-        public Task Create(ItemsDto newItem);
+        public Task Create(CreateItemsDto newItem);
         public Task Update(ItemsDto newItem);
         public Task Delete(int id);
     }

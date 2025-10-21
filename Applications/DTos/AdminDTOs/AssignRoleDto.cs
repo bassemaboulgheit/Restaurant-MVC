@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Applications.DTos
+namespace Applications.DTos.AdminDTOs
 {
     public class AssignRoleDto
     {

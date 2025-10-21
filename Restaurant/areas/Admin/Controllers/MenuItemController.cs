@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Applications.DTos;
+using Applications.DTos.ItemDTOs;
 using Applications.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +38,7 @@ namespace Restaurant.areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ItemsDto newItem)
+        public async Task<IActionResult> Create(CreateItemsDto newItem)
         {
             if (!ModelState.IsValid)
             {

@@ -1,32 +1,314 @@
-﻿@model CategoryDto 
+﻿@using Applications.DTos.CategoryDTOs
+@model CategoryDto
 @{
-    ViewData["Title"] = "Edit";
-	Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+    ViewData["Title"] = "Edit Category";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
 }
 
-<h1>Edit</h1>
+<style>
+    .edit-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
 
-<form asp-action="Edit">
-    <div class="form-horizontal">
-        <hr />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" asp-for="Id" />
-        <div class="form-group">
-            <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+    .page-title {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+        .page-title h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 14px;
+        }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        padding: 25px;
+        color: white;
+    }
+
+        .form-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .form-body {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 14px;
+        display: block;
+    }
+
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+        .form-control:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.15);
+            outline: none;
+        }
+
+    textarea.form-control {
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .validation-summary {
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #d32f2f;
+        font-size: 14px;
+    }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .validation-summary li {
+            margin-bottom: 5px;
+        }
+
+    .text-danger {
+        display: block;
+        color: #d32f2f;
+        font-size: 13px;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+
+    .form-control.is-invalid {
+        border-color: #d32f2f;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .btn-action {
+        padding: 11px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .btn-submit {
+        background: #f59e0b;
+        color: white;
+    }
+
+        .btn-submit:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+    .btn-back {
+        background: #f0f0f0;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            color: #333;
+            text-decoration: none;
+        }
+
+    .character-count {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+    }
+
+    .info-badge {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        color: #92400e;
+        font-size: 13px;
+    }
+
+    @@media (max-width: 576px) {
+        .edit-container {
+            margin: 20px 15px;
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .page-title h2 {
+            font-size: 22px;
+        }
+
+        .btn-action {
+            flex: 1 !important;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <!-- Page Title -->
+    <div class="page-title">
+        <h2>
+            <i class="bi bi-pencil-square"></i> Edit Category
+        </h2>
+        <p>Update category information</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <!-- Header -->
+        <div class="form-header">
+            <h4>
+                <i class="bi bi-pencil"></i> Edit Details
+            </h4>
         </div>
-        <div class="form-group">
-            <label asp-for="Description" class="control-label"></label>
-            <input asp-for="Description" class="form-control" />
-            <span asp-validation-for="Description" class="text-danger"></span>
+
+        <!-- Body -->
+        <div class="form-body">
+            <form asp-action="Edit" method="post" novalidate>
+                <!-- Info Badge -->
+                <div class="info-badge">
+                    <i class="bi bi-info-circle"></i> Make changes to the category details below
+                </div>
+
+                <!-- Validation Summary -->
+                @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+                {
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                }
+
+                <!-- Hidden ID -->
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label asp-for="Name" class="form-label">
+                        <i class="bi bi-tag"></i> Category Name <span style="color: #d32f2f;">*</span>
+                    </label>
+                    <input asp-for="Name"
+                           type="text"
+                           class="form-control"
+                           placeholder="Enter category name"
+                           maxlength="100"
+                           required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <div class="character-count">
+                        <span id="nameCount">0</span>/100 characters
+                    </div>
+                </div>
+
+                <!-- Description Field -->
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label">
+                        <i class="bi bi-file-text"></i> Description
+                    </label>
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter category description (optional)"
+                              maxlength="500"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                    <div class="character-count">
+                        <span id="descCount">0</span>/500 characters
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <a asp-action="GetAll" class="btn-action btn-back">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn-action btn-submit">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-			<input type="submit" value="Save" class="btn btn-primary" />
-			<a asp-action="GetAll" class="btn btn-secondary">Back to List</a>
-            </div>
-	</div>
-</form>
+    </div>
+</div>
+
+<script>
+    // Character counter for Name
+    var nameInput = document.getElementById('Name');
+    if (nameInput) {
+        nameInput.addEventListener('input', function() {
+            document.getElementById('nameCount').textContent = this.value.length;
+        });
+        // Initialize count on page load
+        document.getElementById('nameCount').textContent = nameInput.value.length;
+    }
+
+    // Character counter for Description
+    var descInput = document.getElementById('Description');
+    if (descInput) {
+        descInput.addEventListener('input', function() {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+        // Initialize count on page load
+        document.getElementById('descCount').textContent = descInput.value.length;
+    }
+</script>
+
 @section Scripts {
-	<partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial" />
 }

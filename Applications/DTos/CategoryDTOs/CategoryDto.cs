@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Applications.DTos.ItemDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
-namespace Applications.DTos
+namespace Applications.DTos.CategoryDTOs
 {
     public class CategoryDto
     {

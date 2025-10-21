@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Applications.DTos;
+using Applications.DTos.ItemDTOs;
 using Applications.Services;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
