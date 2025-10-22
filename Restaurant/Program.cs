@@ -3,6 +3,7 @@ using Applications.Contracts;
 using Applications.Services;
 using Infrastructure;
 using Infrastructure.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,9 +19,11 @@ namespace Restaurant
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSession(option=>
+            builder.Services.AddSession(options=>
             {
-                option.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
             });
            
             builder.Services.AddDbContext<RestaurantDb>(options =>
@@ -38,12 +41,20 @@ namespace Restaurant
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<RestaurantDb>();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            });
+
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICategoryService,CategoryService>();
             builder.Services.AddScoped<IMenuCategoryRepository,CategoryRepository>();
             builder.Services.AddScoped<IMenuItemService, MenuItemService>();
             builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<ICartService, CartService>();
 
             var app = builder.Build();
 
@@ -52,12 +63,17 @@ namespace Restaurant
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            //app.UseMiddleware<Web_App_MVC.MiddleWare.DateMiddleWare>();
+
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthentication();
-            
+
+            app.UseSession();
+
             app.UseAuthorization();
 
             app.MapControllerRoute(

@@ -53,7 +53,7 @@ namespace Restaurant.areas.Identity.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDto userDto)
         {
             if (ModelState.IsValid)

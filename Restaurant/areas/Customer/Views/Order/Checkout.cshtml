@@ -1,0 +1,145 @@
+﻿@using Applications.DTos.OrderDTOs
+@model CreateOrderDto
+
+@{
+    ViewData["Title"] = "Checkout";
+    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Checkout</h2>
+            <hr />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <strong>Please fix the following errors:</strong>
+                    <ul>
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            @foreach (var error in modelState.Errors)
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form method="post" asp-action="Checkout" asp-controller="Order" asp-area="Customer">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Customer Information -->
+                <h4 class="mt-4">Customer Information</h4>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CustomerName" class="form-label fw-bold">Name *</label>
+                    <input asp-for="CustomerName" class="form-control" placeholder="Enter your name" required />
+                    <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CustomerPhone" class="form-label fw-bold">Phone *</label>
+                    <input asp-for="CustomerPhone" class="form-control" type="tel" placeholder="Enter your phone" required />
+                    <span asp-validation-for="CustomerPhone" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CustomerEmail" class="form-label fw-bold">Email *</label>
+                    <input asp-for="CustomerEmail" class="form-control" type="email" placeholder="Enter your email" required />
+                    <span asp-validation-for="CustomerEmail" class="text-danger small"></span>
+                </div>
+
+                <!-- Order Type -->
+                <h4 class="mt-4">Order Type</h4>
+
+                <div class="form-group mb-3">
+                    <label asp-for="OrderType" class="form-label fw-bold">Select Order Type *</label>
+                    <select asp-for="OrderType" class="form-select" id="orderType" required>
+                        <option value="">-- Select Order Type --</option>
+                        <option value="0">Dine In</option>
+                        <option value="1">Takeout</option>
+                        <option value="2">Delivery</option>
+                    </select>
+                    <span asp-validation-for="OrderType" class="text-danger small"></span>
+                </div>
+
+                <!-- Delivery Address (shown only for Delivery) -->
+                <div class="form-group mb-3" id="deliveryAddressDiv" style="display:none;">
+                    <label asp-for="DeliveryAddress" class="form-label fw-bold">Delivery Address</label>
+                    <textarea asp-for="DeliveryAddress" class="form-control" rows="3" placeholder="Enter delivery address"></textarea>
+                    <span asp-validation-for="DeliveryAddress" class="text-danger small"></span>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle me-2"></i>Place Order
+                    </button>
+                    <a href="@Url.Action("GetAll", "MenuItem", new { area = "Customer" })" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Menu
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    @if (Context.Session.GetString("UserCart") != null)
+                    {
+                        <p>Items in your cart are ready to order.</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Your cart is empty</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Show/hide delivery address based on order type
+            $('#orderType').change(function () {
+                const selectedValue = $(this).val();
+
+                if (selectedValue == 2) { // 2 = Delivery
+                    $('#deliveryAddressDiv').show();
+                } else {
+                    $('#deliveryAddressDiv').hide();
+                }
+            });
+
+            // Trigger change on page load
+            $('#orderType').change();
+
+            // Form submission handler
+            $('form').on('submit', function (e) {
+                const name = $('input[name="CustomerName"]').val();
+                const phone = $('input[name="CustomerPhone"]').val();
+                const email = $('input[name="CustomerEmail"]').val();
+                const orderType = $('select[name="OrderType"]').val();
+
+                if (!name || !phone || !email || !orderType) {
+                    e.preventDefault();
+                    alert('Please fill all required fields');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    </script>
+}

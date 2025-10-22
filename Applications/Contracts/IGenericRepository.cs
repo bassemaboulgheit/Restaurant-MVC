@@ -10,7 +10,7 @@ namespace Applications.Contracts
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {
-        Task<IQueryable<T>> GetAll(params Expression<Func<T, object>>[] includes);
+        Task<List<T>> GetAll(params Expression<Func<T, object>>[] includes);
 
         //public Task<IQueryable<T>> Get(Expression<Func<T, bool>>? filter = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true);
 
@@ -22,6 +22,8 @@ namespace Applications.Contracts
         Task Create(T entity);
         Task Update(T entity);
         Task Delete(int id);
+        public Task<List<T>> GetAllDeleted();
+        public Task<bool> Restore(int id);
         Task Save();
     }
 }

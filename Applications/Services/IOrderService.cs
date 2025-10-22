@@ -3,10 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Applications.Contracts;
+using Applications.DTos.ItemDTOs;
+using Applications.DTos.OrderDTOs;
+using Applications.DTos.OrderItemsDTOs;
+using Models;
 
 namespace Applications.Services
 {
-    internal interface IOrderService
+    public interface IOrderService
     {
+        //public  Task<List<OrderDto>> GetAll();
+        //public  Task<OrderDto?> GetById(int orderId);
+        //public  Task Create(CreateOrderDto orderDto);
+        //public  Task<bool> UpdateStatusAsync(int orderId, OrderStatus newStatus);
+        //public  Task CancelOrder(int orderId);
+        //public Task Delete(int orderId);
+
+        public Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrderDto, string userId);
+        public Task<OrderDto> GetOrderByIdAsync(int id);
+        public Task<List<OrderDto>> GetUserOrdersAsync(string userId);
+        public Task<List<OrderDto>> GetAllOrdersAsync();
+        public Task<OrderDto> UpdateOrderAsync(int id, OrderDto orderDto);
+        public Task<OrderDto> UpdateOrderStatusAsync(int id, OrderStatus status);
+
+        public Task<bool> DeleteOrderAsync(int id);
+        public Task<bool> RestoreOrderAsync(int id);
+        public Task<List<OrderDto>> GetDeletedOrdersAsync();
     }
 }

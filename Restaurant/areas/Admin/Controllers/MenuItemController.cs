@@ -69,13 +69,14 @@ namespace Restaurant.areas.Admin.Controllers
                 {
                     return NotFound();
                 }
+
                 await _itemService.Update(updatedItem);
                 return RedirectToAction(nameof(GetAll));
             }
             ViewBag.categories = await _categoryService.GetAll();
             return View(updatedItem);
         }
-
+        [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _itemService.GetById(id);

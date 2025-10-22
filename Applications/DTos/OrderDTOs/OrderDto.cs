@@ -11,10 +11,26 @@ using Models;
 
 namespace Applications.DTos.OrderDTOs
 {
+
     public class OrderDto
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Customer name is required")]
+        [StringLength(100, ErrorMessage = "Customer name cannot exceed 100 characters")]
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required")]
+        [Phone(ErrorMessage = "Invalid phone number")]
+        [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
+        [Display(Name = "Phone Number")]
+        public string CustomerPhone { get; set; }
+
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
+        [Display(Name = "Email")]
+        public string CustomerEmail { get; set; }
 
         [Required(ErrorMessage = "Order type is required")]
         [Display(Name = "Order Type")]
@@ -62,9 +78,11 @@ namespace Applications.DTos.OrderDTOs
 
         public int TotalPreparationTime { get; set; }
 
-        [ForeignKey("user")]
+        public DateTime? LastUpdated { get; set; }
+
         public string? userId { get; set; }
-        public List<OrderItemsDto>? OrderItems { get; set; } 
-        public LoginDto? user { get; set; }
+
+        [Display(Name = "Order Items")]
+        public List<OrderItemsDto>? OrderItems { get; set; } = new List<OrderItemsDto>();
     }
 }

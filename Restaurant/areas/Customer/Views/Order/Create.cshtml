@@ -1,0 +1,131 @@
+﻿@using Applications.DTos.OrderDTOs
+@model CreateOrderDto
+@{
+    ViewData["Title"] = "Create New Order";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Create New Order</h1>
+            <hr />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <h5>Please fix the following errors:</h5>
+                    <ul>
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            @foreach (var error in modelState.Errors)
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+
+            <!-- Cart Summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5>Shopping Cart</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Cart?.Items?.Count > 0)
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.Cart.Items)
+                                {
+                                    <tr>
+                                        <td>@item.MenuItemName</td>
+                                        <td>@item.Quantity</td>
+                                        <td>$@item.UnitPrice.ToString("F2")</td>
+                                        <td>$@item.Subtotal.ToString("F2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="text-end">
+                            <h5>Cart Total: <strong>$@ViewBag.Cart.Total.ToString("F2")</strong></h5>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Order Form -->
+            <form method="post">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5>Customer Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="CustomerName" class="form-label">Customer Name *</label>
+                            @* <input type="text" class="form-control @(ModelState.IsValid ? "" : "is-invalid")" *@
+                                   asp-for="CustomerName" required />
+                            <span asp-validation-for="CustomerName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="CustomerPhone" class="form-label">Phone Number *</label>
+                            @* <input type="tel" class="form-control @(ModelState.IsValid ? "" : "is-invalid")" *@
+                                   asp-for="CustomerPhone" required />
+                            <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="CustomerEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" asp-for="CustomerEmail" />
+                            <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="OrderType" class="form-label">Order Type *</label>
+                            <select class="form-control" asp-for="OrderType" required>
+                                <option value="">-- Select Order Type --</option>
+                                <option value="@OrderType.DineIn">Dine In</option>
+                                <option value="@OrderType.Takeout">Takeout</option>
+                                <option value="@OrderType.Delivery">Delivery</option>
+                            </select>
+                            <span asp-validation-for="OrderType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3" id="deliveryAddressSection" style="display:none;">
+                            <label for="DeliveryAddress" class="form-label">Delivery Address *</label>
+                            <textarea class="form-control" asp-for="DeliveryAddress"
+                                      rows="3" placeholder="Enter delivery address"></textarea>
+                            <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">Place Order</button>
+                    <a href="@Url.Action("Index", "MenuItem")" class="btn btn-secondary btn-lg">Continue Shopping</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/Hide delivery address based on order type
+    document.getElementById('OrderType').addEventListener('change', function() {
+        const deliverySection = document.getElementById('deliveryAddressSection');
+        if (this.value === '@OrderType.Delivery') {
+            deliverySection.style.display = 'block';
+        } else {
+            deliverySection.style.display = 'none';
+        }
+    });
+</script>

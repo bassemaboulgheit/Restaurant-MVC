@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Applications.DTos.CategoryDTOs;
+using Applications.DTos.OrderItemsDTOs;
 
 namespace Applications.DTos.ItemDTOs
 {
@@ -35,6 +37,11 @@ namespace Applications.DTos.ItemDTOs
         [Display(Name = "Image URL")]
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
+
+        [Required(ErrorMessage = "Preparation time is required")]
+        [Range(1, 300, ErrorMessage = "Preparation time must be between 1 and 300 minutes")]
+        [Display(Name = "Preparation Time (Minutes)")]
+        public int PreparationTime { get; set; }
 
     }
 }

@@ -41,6 +41,10 @@ namespace Infrastructure.Repository
             if (order != null)
             {
                 order.IsDeleted = true;
+                foreach (var item in context.OrderItems.Where(oi => oi.OrderId == orderId))
+                {
+                    item.IsDeleted = true;
+                }
             }
         }
         public async Task Save()

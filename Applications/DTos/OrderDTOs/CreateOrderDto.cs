@@ -1,11 +1,29 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Applications.DTos.OrderItemsDTOs;
+using Applications.DTos.UsersDTo;
 using Models;
 
 namespace Applications.DTos.OrderDTOs
 {
     public class CreateOrderDto
     {
+
+        [Required(ErrorMessage = "Customer name is required")]
+        [StringLength(100, ErrorMessage = "Customer name cannot exceed 100 characters")]
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required")]
+        [Phone(ErrorMessage = "Invalid phone number")]
+        [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
+        [Display(Name = "Phone Number")]
+        public string CustomerPhone { get; set; }
+
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
+        [Display(Name = "Email")]
+        public string CustomerEmail { get; set; }
 
         [Required(ErrorMessage = "Order type is required")]
         [Display(Name = "Order Type")]
@@ -23,7 +41,7 @@ namespace Applications.DTos.OrderDTOs
 
         [MaxLength(500, ErrorMessage = "Delivery address cannot exceed 500 characters")]
         [Display(Name = "Delivery Address")]
-        public string DeliveryAddress { get; set; }
+        public string? DeliveryAddress { get; set; }
 
 
         [Column(TypeName = "decimal(18,2)")]
@@ -53,6 +71,11 @@ namespace Applications.DTos.OrderDTOs
 
         public int TotalPreparationTime { get; set; }
 
-        
+        public DateTime? LastUpdated { get; set; }
+        public string? userId { get; set; }
+
+        [Display(Name = "Order Items")]
+        [Required(ErrorMessage = "Order must contain at least one item")]
+        public List<CreateOrderItemsDto>? OrderItems { get; set; } = new List<CreateOrderItemsDto>();
     }
 }

@@ -22,5 +22,4 @@ namespace Models
         // Navigation Property
         public  List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
     }
-
 }

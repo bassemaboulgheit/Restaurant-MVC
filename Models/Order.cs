@@ -20,6 +20,21 @@ namespace Models
     }
     public class Order : BaseEntity
     {
+        [Required(ErrorMessage = "Customer name is required")]
+        [MaxLength(100, ErrorMessage = "Customer name cannot exceed 100 characters")]
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required")]
+        [Phone(ErrorMessage = "Invalid phone number")]
+        [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
+        [Display(Name = "Phone Number")]
+        public string CustomerPhone { get; set; }
+
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
+        [Display(Name = "Email")]
+        public string CustomerEmail { get; set; }
 
         [Required(ErrorMessage = "Order type is required")]
         [Display(Name = "Order Type")]
@@ -37,7 +52,7 @@ namespace Models
 
         [MaxLength(500, ErrorMessage = "Delivery address cannot exceed 500 characters")]
         [Display(Name = "Delivery Address")]
-        public string DeliveryAddress { get; set; }
+        public string? DeliveryAddress { get; set; }
 
 
         [Column(TypeName = "decimal(18,2)")]
@@ -66,9 +81,14 @@ namespace Models
         public DateTime? EstimatedDeliveryTime { get; set; }
 
         public int TotalPreparationTime { get; set; }
+
+        public DateTime? LastUpdated { get; set; }     // new
+
+
+        [ForeignKey("ApplicationUser")]
         public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; } 
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public ApplicationUser ApplicationUser { get; set; } = new ApplicationUser();
 
 
 

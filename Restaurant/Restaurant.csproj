@@ -17,6 +17,8 @@
     <Folder Include="Areas\Admin\Views\Category\" />
     <Folder Include="Areas\Customer\Data\" />
     <Folder Include="Areas\Customer\Models\" />
+    <Folder Include="areas\Customer\Views\Cart\" />
+    <Folder Include="areas\Customer\Views\Order\" />
     <Folder Include="Areas\Identity\Data\" />
     <Folder Include="Areas\Identity\Models\" />
     <Folder Include="Controllers\" />

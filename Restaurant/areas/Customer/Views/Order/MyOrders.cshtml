@@ -1,0 +1,68 @@
+﻿@using Applications.DTos.OrderDTOs
+@model List<OrderDto>
+
+@{
+    ViewData["Title"] = "My Orders";
+    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2>My Orders</h2>
+    <hr />
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            <p>No orders yet.</p>
+            <a href="@Url.Action("GetAll", "MenuItem", new { area = "Customer" })" class="btn btn-primary">Browse Menu</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order #</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>#@order.Id</td>
+                            <td>@order.OrderDate.ToString("MM/dd/yyyy")</td>
+                            <td>$@order.TotalAmount.ToString("F2")</td>
+                            <td>
+                                @{
+                                    string statusClass = order.OrderStatus switch
+                                    {
+                                        OrderStatus.Pending => "bg-warning",
+                                        OrderStatus.Preparing => "bg-info",
+                                        OrderStatus.Ready => "bg-success",
+                                        OrderStatus.Delivered => "bg-success",
+                                        OrderStatus.Cancelled => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @statusClass">@order.OrderStatus</span>
+                            </td>
+                            <td>@order.OrderType</td>
+                            <td>
+                                <a href="@Url.Action("Details", "Order", new { id = order.Id, area = "Customer" })"
+                                   class="btn btn-sm btn-info">Details</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <a href="@Url.Action("GetAll", "MenuItem", new { area = "Customer" })" class="btn btn-secondary mt-3">Back</a>
+</div>

@@ -45,9 +45,19 @@ namespace Applications.DTos.ItemDTOs
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
 
+        [Required(ErrorMessage = "Preparation time is required")]
+        [Range(1, 300, ErrorMessage = "Preparation time must be between 1 and 300 minutes")]
+        [Display(Name = "Preparation Time (Minutes)")]
+        public int PreparationTime { get; set; }
+
+        [Display(Name = "Daily Order Count")]
+        public int DailyOrderCount { get; set; } = 0;
+
+        [Display(Name = "Last Reset Date")]
+        public DateTime LastResetDate { get; set; } = DateTime.Today;
         public CategoryDto? Category { get; set; } 
 
-        public List<OrderItemsDto?> OrderItems { get; set; } = new List<OrderItemsDto>();
+        public List<OrderItemsDto?> OrderItems { get; set; } = new();
     }
     
 }

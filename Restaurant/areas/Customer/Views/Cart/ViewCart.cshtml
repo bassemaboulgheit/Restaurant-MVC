@@ -1,0 +1,200 @@
+﻿@* @model Models.Cart
+
+<h2>Your Cart</h2>
+
+@if (!Model.CartItems.Any())
+{
+    <p>No items in your cart.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CartItems)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.UnitPrice.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Total.ToString("C")</td>
+                    <td>
+                        <a asp-action="Remove" asp-route-id="@item.MenuItemId" class="btn btn-danger btn-sm">Remove</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Total: @Model.CartItems.Sum(i => i.Total).ToString("C")</h4>
+    <a asp-action="Clear" class="btn btn-warning">Clear Cart</a>
+    <a href="@Url.Action("Checkout", "Order")" class="btn btn-success">Proceed to Checkout</a>
+} *@
+
+
+@model Cart
+@using Models
+@{
+    ViewData["Title"] = "My Cart";
+    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4">
+        <i class="bi bi-cart3 me-2"></i>Shopping Cart
+    </h2>
+
+    @if (Model?.CartItems?.Count > 0)
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Cart Items Table -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.CartItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                    {
+                                                        <img src="@item.ImageUrl"
+                                                             alt="@item.Name"
+                                                             style="width: 60px; height: 60px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-0">@item.Name</h6>
+                                                        <small class="text-muted">ID: @item.MenuItemId</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <strong>$@item.UnitPrice.ToString("F2")</strong>
+                                            </td>
+                                            <td class="align-middle">
+                                                <span class="badge bg-info">@item.Quantity</span>
+                                            </td>
+                                            <td class="align-middle">
+                                                <strong class="text-success">$@item.Total.ToString("F2")</strong>
+                                            </td>
+                                            <td class="align-middle">
+                                                <form method="post" asp-action="RemoveItem" asp-controller="Cart"
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="menuItemId" value="@item.MenuItemId" />
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue Shopping -->
+                <a href="@Url.Action("GetAll", "MenuItem")" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                </a>
+            </div>
+
+            <!-- Sidebar Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Items Count -->
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Items:</span>
+                            <strong>@Model.CartItems.Count</strong>
+                        </div>
+
+                        <!-- Subtotal -->
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+                            <span>Subtotal:</span>
+                            <strong>$@Model.CartItems.Sum(x => x.Total).ToString("F2")</strong>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="alert alert-info alert-sm" role="alert">
+                            <small>
+                                <i class="bi bi-info-circle me-2"></i>
+                                Tax and delivery will be calculated at checkout
+                            </small>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5>Total:</h5>
+                            <h5 class="text-success">$@Model.CartItems.Sum(x => x.Total).ToString("F2")</h5>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <a href="@Url.Action("Checkout", "Order")" class="btn btn-success w-100 btn-lg mb-2">
+                            <i class="bi bi-check-circle me-2"></i>Proceed to Checkout
+                        </a>
+
+                        <!-- Clear Cart -->
+                        <form method="post" asp-action="ClearCart" asp-controller="Cart">
+                            <button type="submit" class="btn btn-outline-danger w-100"
+                                    onclick="return confirm('Are you sure you want to clear your cart?')">
+                                <i class="bi bi-trash me-2"></i>Clear Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Empty Cart Message -->
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x" style="font-size: 5rem; color: #ccc;"></i>
+            <h3 class="text-muted mt-3">Your cart is empty</h3>
+            <p class="text-muted mb-4">Add some items to get started</p>
+            <a href="@Url.Action("GetAll", "MenuItem")" class="btn btn-primary btn-lg">
+                <i class="bi bi-bag-plus me-2"></i>Start Shopping
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    .alert-sm {
+        padding: 0.5rem 1rem;
+        margin-bottom: 0;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .sticky-top {
+        z-index: 1000;
+    }
+</style>

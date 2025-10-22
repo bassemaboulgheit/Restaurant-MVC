@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace Models
 {
@@ -40,20 +41,25 @@ namespace Models
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
 
+        [Required(ErrorMessage = "Preparation time is required")]
+        [Range(1, 300, ErrorMessage = "Preparation time must be between 1 and 300 minutes")]
+        [Display(Name = "Preparation Time (Minutes)")]
+        public int PreparationTime { get; set; }
 
-        //[Display(Name = "Daily Order Count")]
-        //public int DailyOrderCount { get; set; } = 0;
 
+        [Display(Name = "Daily Order Count")]
+        public int DailyOrderCount { get; set; } = 0;
+
+        [Display(Name = "Last Reset Date")]
+        public DateTime LastResetDate { get; set; } = DateTime.Today;
 
         // Navigation Properties
-        public  Category? Category { get; set; }
+        public Category? Category { get; set; }
 
         public  List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
 
 
-        //[Display(Name = "Last Reset Date")]
-        //public DateTime LastResetDate { get; set; } = DateTime.Today;
 
         //[Required(ErrorMessage = "Preparation time is required")]
         //[Range(1, 300, ErrorMessage = "Preparation time must be between 1 and 300 minutes")]

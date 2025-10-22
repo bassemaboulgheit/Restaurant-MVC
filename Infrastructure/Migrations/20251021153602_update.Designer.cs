@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(RestaurantDb))]
-    partial class RestaurantDbModelSnapshot : ModelSnapshot
+    [Migration("20251021153602_update")]
+    partial class update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,7 +350,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Crispy rolls stuffed with vegetables.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Spring Rolls",
                             PreparationTime = 0,
                             Price = 45m,
@@ -361,7 +364,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Juicy grilled chicken with herbs.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Grilled Chicken",
                             PreparationTime = 0,
                             Price = 120m,
@@ -375,7 +378,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Classic beef burger with cheese and fries.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Beef Burger",
                             PreparationTime = 0,
                             Price = 95m,
@@ -389,7 +392,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Rich chocolate cake with icing.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Chocolate Cake",
                             PreparationTime = 0,
                             Price = 60m,
@@ -403,7 +406,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Freshly squeezed orange juice.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Orange Juice",
                             PreparationTime = 0,
                             Price = 30m,
@@ -417,7 +420,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Crisp romaine lettuce with Caesar dressing.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Caesar Salad",
                             PreparationTime = 0,
                             Price = 50m,
@@ -431,7 +434,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Classic Italian pasta with meat sauce.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Spaghetti Bolognese",
                             PreparationTime = 0,
                             Price = 110m,
@@ -445,7 +448,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Coffee-flavored Italian dessert.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Tiramisu",
                             PreparationTime = 0,
                             Price = 70m,
@@ -459,7 +462,7 @@ namespace Infrastructure.Migrations
                             DailyOrderCount = 0,
                             Description = "Refreshing lemon drink.",
                             IsDeleted = false,
-                            LastResetDate = new DateTime(2025, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            LastResetDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Local),
                             Name = "Lemonade",
                             PreparationTime = 0,
                             Price = 25m,
@@ -498,6 +501,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("DeliveryAddress")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -509,9 +513,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");

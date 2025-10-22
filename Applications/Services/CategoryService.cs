@@ -20,8 +20,7 @@ namespace Applications.Services
 
         public async Task<List<CategoryDto>> GetAll()
         {
-            var query = await _categoryRepo.GetAll(i=>i.MenuItems);
-            var categories = await query.ToListAsync();
+            var categories = await _categoryRepo.GetAll(i=>i.MenuItems);
             var categoryDtos = categories.Select(category => new CategoryDto
             {
                 Id = category.Id,
@@ -121,6 +120,10 @@ namespace Applications.Services
                 return;
             }
             await _categoryRepo.Delete(id);
+            foreach (var item in category.MenuItems)
+            {
+                item.IsDeleted = true;
+            }
             await _categoryRepo.Save();
         }
 

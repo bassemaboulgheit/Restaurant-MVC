@@ -20,7 +20,7 @@ namespace Infrastructure.Repository
             _dbSet = _context.Set<T>();
         }
 
-        public async Task<IQueryable<T>> GetAll( Expression<Func<T, object>>[]? includes = null)
+        public async Task<List<T>> GetAll( Expression<Func<T, object>>[]? includes = null)
         //public async Task<IQueryable<T>> Get(Expression<Func<T, bool>>? filter = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true)
         {
             IQueryable<T> query = _dbSet;
@@ -40,13 +40,13 @@ namespace Infrastructure.Repository
             //}
             //return  query;
 
-            return  query;
+            return await query.ToListAsync();
         }
 
         public async Task<T?> GetById(int id , params Expression<Func<T, object>>[] includes)   
         {
             IQueryable<T> query = _dbSet;
-            if (includes != null)
+            if (includes != null && includes.Length > 0)
             {
                 foreach (var include in includes)
                 {
@@ -65,7 +65,22 @@ namespace Infrastructure.Repository
 
         public async Task<List<T>> GetListByName(string name, params Expression<Func<T, object>>[] includes)
         {
-            return await _dbSet.Where(e => EF.Property<string>(e, "Name").Contains(name)).ToListAsync();
+            if (string.IsNullOrWhiteSpace(name))
+                return new List<T>();
+
+            IQueryable<T> query = _dbSet;
+
+            if (includes != null && includes.Length > 0)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query
+                .Where(e => EF.Property<string>(e, "Name").Contains(name))
+                .ToListAsync();
         }
 
 
@@ -73,7 +88,7 @@ namespace Infrastructure.Repository
         {
             IQueryable<T> query = _dbSet.AsQueryable();
 
-            if (includes != null)
+            if (includes != null && includes.Length > 0)
             {
                 foreach (var include in includes)
                 {
@@ -110,7 +125,7 @@ namespace Infrastructure.Repository
             }
         }
 
-        public async Task<bool> Restor(int id)
+        public async Task<bool> Restore(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity != null && entity.IsDeleted)
@@ -124,7 +139,7 @@ namespace Infrastructure.Repository
 
         public async Task<List<T>> GetAllDeleted()
         {
-             return await _dbSet.IgnoreQueryFilters().ToListAsync();
+            return await _dbSet.IgnoreQueryFilters().Where(e => e.IsDeleted).ToListAsync();
         }
 
         public async Task Save()

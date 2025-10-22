@@ -54,8 +54,8 @@
                         </a>
                         <div class="dropdown-menu">
                             @* <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">Profile</a> *@
-                            
-                            @if (User.IsInRole("Customer"))
+
+                            @if (User.IsInRole("Admin"))
                             {
                                 <a class="dropdown-item" asp-area="Identity" asp-controller="Order" asp-action="MyOrders">My Orders</a>
                             }

@@ -38,28 +38,53 @@
                         }
                     </ul>
                 </li>
-                @* <li class="nav-item">
-                    <a class="nav-link" asp-area="Customer" asp-controller="MenuItem" asp-action="GetAll">Menu Items</a>
-                </li> *@
+
+                <!-- Menu Items Link -->
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Customer" asp-controller="MenuItem" asp-action="GetAll">
+                        <i class="bi bi-list me-1"></i>Menu
+                    </a>
+                </li>
+
+                <!-- Cart Link (Only for Authenticated Users) -->
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="ViewCart">
+                            <i class="bi bi-cart3 me-1"></i>Cart
+                        </a>
+                    </li>
+                }
 
                 @* Authentication Links *@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Account
+                            <i class="bi bi-person-circle me-1"></i>Account
                         </a>
 
                         <div class="dropdown-menu" aria-labelledby="userMenu">
                             @if (User.IsInRole("Customer"))
                             {
-                                <a class="dropdown-item" asp-area="Identity" asp-controller="Order" asp-action="MyOrders">My Orders</a>
+                                <a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders">
+                                    <i class="bi bi-bag-check me-2"></i>My Orders
+                                </a>
+                            }
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Order" asp-action="Index">
+                                    <i class="bi bi-graph-up me-2"></i>All Orders (Admin)
+                                </a>
                             }
 
                             <div class="dropdown-divider"></div>
 
                             <form asp-area="Identity" asp-controller="Account" asp-action="SignOut" method="post" class="d-inline">
-                                <button type="submit" class="dropdown-item">Log Out</button>
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Log Out
+                                </button>
                             </form>
                         </div>
                     </li>
@@ -67,10 +92,14 @@
                 else
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">Register</a>
+                        <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">
+                            <i class="bi bi-person-plus me-1"></i>Register
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">Login</a>
+                        <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                        </a>
                     </li>
                 }
             </ul>
@@ -78,14 +107,16 @@
             @* Search Form *@
             <form class="d-flex" asp-area="Customer" asp-controller="Category" asp-action="Search" method="get">
                 <input class="form-control me-sm-2" type="search" name="searchTerm" placeholder="Search menu..." />
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit">
+                    <i class="bi bi-search me-1"></i>Search
+                </button>
             </form>
 
             @* User Greeting *@
             @if (User.Identity.IsAuthenticated)
             {
-                <span class="navbar-text ms-3">
-                    Hello @User.Identity.Name
+                <span class="navbar-text ms-3 text-white">
+                    <i class="bi bi-person me-1"></i>Hello @User.Identity.Name
                 </span>
             }
         </div>

@@ -1,0 +1,79 @@
+﻿@using Applications.DTos.OrderDTOs
+@using Applications.DTos.OrderItemsDTOs
+@model OrderDto
+
+@{
+    ViewData["Title"] = "Order Details";
+    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Order #@Model.Id</h2>
+            <hr />
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Customer Info</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> @Model.CustomerName</p>
+                    <p><strong>Phone:</strong> @Model.CustomerPhone</p>
+                    <p><strong>Email:</strong> @Model.CustomerEmail</p>
+                    <p><strong>Type:</strong> @Model.OrderType</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Items</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderItems ?? new List<OrderItemsDto>())
+                            {
+                                <tr>
+                                    <td>@item.MenuItem?.Name</td>
+                                    <td>@item.Quantity</td>
+                                    <td>$@item.UnitPrice.ToString("F2")</td>
+                                    <td>$@item.Subtotal.ToString("F2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p>Subtotal: $@Model.Subtotal.ToString("F2")</p>
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <p>Discount: -$@Model.DiscountAmount.ToString("F2")</p>
+                    }
+                    <p>Tax: $@Model.TaxAmount.ToString("F2")</p>
+                    <h5>Total: $@Model.TotalAmount.ToString("F2")</h5>
+                    <p class="mt-3"><strong>Status:</strong> @Model.OrderStatus</p>
+                    <p><strong>Date:</strong> @Model.OrderDate.ToString("MM/dd/yyyy hh:mm tt")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="@Url.Action("MyOrders", "Order", new { area = "Customer" })" class="btn btn-secondary mt-3">Back</a>
+</div>

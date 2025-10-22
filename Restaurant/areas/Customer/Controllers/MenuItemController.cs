@@ -7,9 +7,7 @@ using Models;
 
 namespace Restaurant.areas.Customer.Controllers
 {
-    //[Authorize]
     [Area(nameof(Customer))]
-    //[Authorize(Roles = nameof(Customer))]
     public class MenuItemController : Controller
     {
         private readonly IMenuItemService _itemService;
