@@ -22,6 +22,7 @@
             <th>Price</th>
             <th>Category Name</th>
             <th>Quantity</th>
+            <th>PreparationTime</th>
             <th>ImageUrl</th>
             @* <th>Actions</th>  *@
         </tr>
@@ -34,6 +35,7 @@
             <td>@Model.Price</td>
             <td>@Model.Category?.Name</td>
             <td>@Model.Quantity</td>
+            <td>@Model.PreparationTime</td>
             <td>
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {

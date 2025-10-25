@@ -19,7 +19,6 @@ namespace Models
         //[Display(Name = "Display Order")]
         //public int DisplayOrder { get; set; }
 
-        // Navigation Property
         public  List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
     }
 }

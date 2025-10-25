@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Applications.Contracts;
+using Microsoft.AspNetCore.Http;
 using Models;
 using Newtonsoft.Json;
 
@@ -7,6 +8,12 @@ namespace Applications.Services
     public class CartService : ICartService
     {
         private const string CartSessionKey = "UserCart";
+        private readonly IGenericRepository<MenuItem> _menuItemRepository;
+
+        public CartService(IGenericRepository<MenuItem> menuItemRepository)
+        {
+            _menuItemRepository = menuItemRepository;
+        }
 
         public Cart GetCart(ISession session)
         {
@@ -22,15 +29,34 @@ namespace Applications.Services
             session.SetString(CartSessionKey, cartJson);
         }
 
-        public void AddItem(ISession session, CartItem item)
+        public async Task AddItem(ISession session, CartItem item)
         {
+            var menuItem = await _menuItemRepository.GetById(item.MenuItemId);
+
+            if (menuItem == null || menuItem.Quantity <= 0)
+            {
+                throw new Exception($"Item '{item.Name}' is no longer available");
+            }
+
             var cart = GetCart(session);
             var existingItem = cart.CartItems.FirstOrDefault(i => i.MenuItemId == item.MenuItemId);
 
             if (existingItem != null)
+            {
+                if (existingItem.Quantity + item.Quantity > menuItem.Quantity)
+                {
+                    throw new Exception($"Only {menuItem.Quantity} units available");
+                }
                 existingItem.Quantity += item.Quantity;
+            }
             else
+            {
+                if (item.Quantity > menuItem.Quantity)
+                {
+                    throw new Exception($"Only {menuItem.Quantity} units available");
+                }
                 cart.CartItems.Add(item);
+            }
 
             SaveCart(session, cart);
         }

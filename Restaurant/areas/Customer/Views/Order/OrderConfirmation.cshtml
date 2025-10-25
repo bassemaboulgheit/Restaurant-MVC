@@ -31,9 +31,11 @@
                         <thead>
                             <tr>
                                 <th>Item</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Total</th>
+                                <th>Image</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                @* <th>Total</th> *@
+                                <th>Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,6 +43,7 @@
                             {
                                 <tr>
                                     <td>@item.MenuItem?.Name</td>
+                                    <td><img src="@item.MenuItem?.ImageUrl" alt="@item.MenuItem?.Name" class="img-thumbnail" style="max-width: 100px;" /></td>
                                     <td>@item.Quantity</td>
                                     <td>$@item.UnitPrice.ToString("F2")</td>
                                     <td>$@item.Subtotal.ToString("F2")</td>

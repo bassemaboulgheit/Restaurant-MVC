@@ -6,6 +6,15 @@
     Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
 }
 
+@* @if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+} *@
+
 <div class="container mt-5">
     <h2>My Orders</h2>
     <hr />
@@ -53,9 +62,26 @@
                                 <span class="badge @statusClass">@order.OrderStatus</span>
                             </td>
                             <td>@order.OrderType</td>
+                            @* <td>
+                                <a href="@Url.Action("Details", "Order", new { id = order.Id, area = "Customer" })"
+                                   class="btn btn-sm btn-info">Details</a>
+                            </td> *@
                             <td>
                                 <a href="@Url.Action("Details", "Order", new { id = order.Id, area = "Customer" })"
                                    class="btn btn-sm btn-info">Details</a>
+
+                                @if (order.OrderStatus != OrderStatus.Ready &&
+                                                        order.OrderStatus != OrderStatus.Delivered &&
+                                                        order.OrderStatus != OrderStatus.Cancelled)
+                                {
+                                    <form asp-area="Customer" asp-action="Cancel" asp-route-id="@order.Id" method="post" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure you want to cancel this order?');">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                }
                             </td>
                         </tr>
                     }

@@ -30,13 +30,6 @@ namespace Restaurant.Areas.Customer.Controllers
             _userManager = userManager;
         }
 
-        private async Task<string> GetCurrentUserIdAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            return user?.Id ?? "";
-        }
-
-        // GET: Order/Checkout
         [HttpGet]
         public IActionResult Checkout()
         {
@@ -44,7 +37,7 @@ namespace Restaurant.Areas.Customer.Controllers
             if (cart.CartItems.Count == 0)
             {
                 TempData["Error"] = "Your cart is empty";
-                return RedirectToAction("Index", "Menu");
+                return RedirectToAction("GetAll", "MenuItem");
             }
 
             var createOrderDto = new CreateOrderDto
@@ -56,7 +49,6 @@ namespace Restaurant.Areas.Customer.Controllers
             return View(createOrderDto);
         }
 
-        // POST: Order/Checkout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout(CreateOrderDto createOrderDto)
@@ -68,7 +60,7 @@ namespace Restaurant.Areas.Customer.Controllers
                 if (cart.CartItems.Count == 0)
                 {
                     TempData["Error"] = "Your cart is empty";
-                    return RedirectToAction("Index", "Menu");
+                    return RedirectToAction("GetAll", "MenuItem");
                 }
 
                 var user = await _userManager.GetUserAsync(User);
@@ -78,7 +70,6 @@ namespace Restaurant.Areas.Customer.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                // Map cart items to order items
                 createOrderDto.OrderItems = cart.CartItems.Select(ci => new CreateOrderItemsDto
                 {
                     MenuItemId = ci.MenuItemId,
@@ -92,10 +83,7 @@ namespace Restaurant.Areas.Customer.Controllers
                     return View(createOrderDto);
                 }
 
-                // Create order
                 var orderDto = await _orderService.CreateOrderAsync(createOrderDto, user.Id);
-
-                // Clear cart
                 _cartService.ClearCart(HttpContext.Session);
 
                 TempData["Success"] = "Order created successfully";
@@ -108,7 +96,6 @@ namespace Restaurant.Areas.Customer.Controllers
             }
         }
 
-        // GET: Order/OrderConfirmation/5
         [HttpGet]
         public async Task<IActionResult> OrderConfirmation(int id)
         {
@@ -117,22 +104,21 @@ namespace Restaurant.Areas.Customer.Controllers
                 var order = await _orderService.GetOrderByIdAsync(id);
                 var user = await _userManager.GetUserAsync(User);
 
-                // Check if user owns this order
                 if (order.userId != user.Id)
                 {
                     return Forbid();
                 }
 
+                ViewBag.Message = "Your order has been placed successfully!";
                 return View(order);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction("Index", "Menu");
+                return RedirectToAction("GetAll", "MenuItem");
             }
         }
 
-        // GET: Order/MyOrders
         [HttpGet]
         public async Task<IActionResult> MyOrders()
         {
@@ -149,7 +135,6 @@ namespace Restaurant.Areas.Customer.Controllers
             }
         }
 
-        // GET: Order/Details/5
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -158,11 +143,14 @@ namespace Restaurant.Areas.Customer.Controllers
                 var order = await _orderService.GetOrderByIdAsync(id);
                 var user = await _userManager.GetUserAsync(User);
 
-                // Check if user owns this order
                 if (order.userId != user.Id && !User.IsInRole("Admin"))
                 {
                     return Forbid();
                 }
+
+                // Customer Notifications
+                ViewBag.StatusMessage = GetStatusNotification(order.OrderStatus);
+                ViewBag.PrepTimeRemaining = GetPrepTimeRemaining(order);
 
                 return View(order);
             }
@@ -173,60 +161,67 @@ namespace Restaurant.Areas.Customer.Controllers
             }
         }
 
-        // Admin: GET: Order/Index
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        // Helper Methods
+        private string GetStatusNotification(OrderStatus status)
+        {
+            return status switch
+            {
+                OrderStatus.Pending => " Your order is pending. We'll start preparing it soon!",
+                OrderStatus.Preparing => "Your order is being prepared. Please wait...",
+                OrderStatus.Ready => " Your order is ready! Please pick it up or it will be delivered soon.",
+                OrderStatus.Delivered => " Your order has been delivered. Thank you!",
+                OrderStatus.Cancelled => " Your order has been cancelled.",
+                _ => "Order status unknown"
+            };
+        }
+
+        private string GetPrepTimeRemaining(OrderDto order)
+        {
+            if (order.LastUpdated == null || order.OrderStatus != OrderStatus.Preparing)
+                return "";
+
+            var timePassed = DateTime.Now - order.LastUpdated.Value;
+            var timeRemaining = order.TotalPreparationTime - (int)timePassed.TotalMinutes;
+
+            if (timeRemaining <= 0)
+                return "Ready soon!";
+
+            return $"{timeRemaining} minutes remaining";
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
         {
             try
             {
-                var orders = await _orderService.GetAllOrdersAsync();
-                return View(orders);
+                var user = await _userManager.GetUserAsync(User);
+                var order = await _orderService.GetOrderByIdAsync(id);
+
+                if (order == null || order.userId != user.Id)
+                {
+                    return Forbid();
+                }
+
+                var result = await _orderService.Cancel(id);
+
+                if (!result)
+                {
+                    TempData["Error"] = "Cannot cancel this order.";
+                }
+                else
+                {
+                    TempData["Success"] = "Order cancelled successfully.";
+                }
+
+                return RedirectToAction("MyOrders");
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error: {ex.Message}";
-                return View(new List<OrderDto>());
+                return RedirectToAction("MyOrders");
             }
         }
 
-        // Admin: POST: Order/UpdateStatus
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int id, int status)
-        {
-            try
-            {
-                var orderStatus = (OrderStatus)status;
-                await _orderService.UpdateOrderStatusAsync(id, orderStatus);
-                TempData["Success"] = "Order status updated successfully";
-                return RedirectToAction("Details", new { id });
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction("Details", new { id });
-            }
-        }
-
-        // Admin: POST: Order/Delete
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                await _orderService.DeleteOrderAsync(id);
-                TempData["Success"] = "Order deleted successfully";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction("Index");
-            }
-        }
     }
 }

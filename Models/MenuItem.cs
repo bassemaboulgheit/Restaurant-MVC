@@ -21,7 +21,6 @@ namespace Models
         [Range(1, 10000.00, ErrorMessage = "Price must be between $1 and $10,000")]
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Price")]
-        //[DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage = "Category is required")]
@@ -53,40 +52,10 @@ namespace Models
         [Display(Name = "Last Reset Date")]
         public DateTime LastResetDate { get; set; } = DateTime.Today;
 
-        // Navigation Properties
         public Category? Category { get; set; }
 
         public  List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-
-
-
-        //[Required(ErrorMessage = "Preparation time is required")]
-        //[Range(1, 300, ErrorMessage = "Preparation time must be between 1 and 300 minutes")]
-        //[Display(Name = "Preparation Time (Minutes)")]
-        //public int PreparationTimeMinutes { get; set; }
-
-
-
-
-        // Business Logic Method
-        //public bool CheckAvailability()
-        //{
-        //    // Reset daily count if new day
-        //    if (LastResetDate.Date < DateTime.Today)
-        //    {
-        //        DailyOrderCount = 0;
-        //        LastResetDate = DateTime.Today;
-        //        IsAvailable = true;
-        //    }
-
-        //    // Items with >50 orders become unavailable
-        //    if (DailyOrderCount >= 50)
-        //    {
-        //        IsAvailable = false;
-        //    }
-        //    return IsAvailable;
-        //}
     }
 
 }

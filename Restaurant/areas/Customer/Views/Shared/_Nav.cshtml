@@ -1,124 +1,124 @@
-﻿@using Applications.Services
-@inject ICategoryService categoryService
+﻿    @using Applications.Services
+    @inject ICategoryService categoryService
 
-@{
-    var categories = await categoryService.GetAll();
-}
+    @{
+        var categories = await categoryService.GetAll();
+    }
 
-<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MazaQ</a>
+    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MazaQ</a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
-                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+                    aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <div class="collapse navbar-collapse" id="navbarColor01">
-            <ul class="navbar-nav me-auto">
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
 
-                <!-- Dropdown Categories -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        Categories
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        @foreach (var category in categories)
-                        {
-                            <li>
-                                <a class="dropdown-item"
-                                   asp-area="Customer"
-                                   asp-controller="Category"
-                                   asp-action="Details"
-                                   asp-route-Id="@category.Id">
-                                    @category.Name
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </li>
-
-                <!-- Menu Items Link -->
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="Customer" asp-controller="MenuItem" asp-action="GetAll">
-                        <i class="bi bi-list me-1"></i>Menu
-                    </a>
-                </li>
-
-                <!-- Cart Link (Only for Authenticated Users) -->
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="ViewCart">
-                            <i class="bi bi-cart3 me-1"></i>Cart
-                        </a>
-                    </li>
-                }
-
-                @* Authentication Links *@
-                @if (User.Identity.IsAuthenticated)
-                {
+                    <!-- Dropdown Categories -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle me-1"></i>Account
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Categories
                         </a>
-
-                        <div class="dropdown-menu" aria-labelledby="userMenu">
-                            @if (User.IsInRole("Customer"))
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            @foreach (var category in categories)
                             {
-                                <a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders">
-                                    <i class="bi bi-bag-check me-2"></i>My Orders
-                                </a>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-area="Customer"
+                                       asp-controller="Category"
+                                       asp-action="Details"
+                                       asp-route-Id="@category.Id">
+                                        @category.Name
+                                    </a>
+                                </li>
                             }
-
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Order" asp-action="Index">
-                                    <i class="bi bi-graph-up me-2"></i>All Orders (Admin)
-                                </a>
-                            }
-
-                            <div class="dropdown-divider"></div>
-
-                            <form asp-area="Identity" asp-controller="Account" asp-action="SignOut" method="post" class="d-inline">
-                                <button type="submit" class="dropdown-item">
-                                    <i class="bi bi-box-arrow-right me-2"></i>Log Out
-                                </button>
-                            </form>
-                        </div>
+                        </ul>
                     </li>
-                }
-                else
+
+                    <!-- Menu Items Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Customer" asp-controller="MenuItem" asp-action="GetAll">
+                            <i class="bi bi-list me-1"></i>Menu
+                        </a>
+                    </li>
+
+                    <!-- Cart Link (Only for Authenticated Users) -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="ViewCart">
+                                <i class="bi bi-cart3 me-1"></i>Cart
+                            </a>
+                        </li>
+                    }
+
+                    @* Authentication Links *@
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>Account
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="userMenu">
+                                @if (User.IsInRole("Customer"))
+                                {
+                                    <a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders">
+                                        <i class="bi bi-bag-check me-2"></i>My Orders
+                                    </a>
+                                }
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Order" asp-action="Index">
+                                        <i class="bi bi-graph-up me-2"></i>All Orders (Admin)
+                                    </a>
+                                }
+
+                                <div class="dropdown-divider"></div>
+
+                                <form asp-area="Identity" asp-controller="Account" asp-action="SignOut" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Log Out
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">
+                                <i class="bi bi-person-plus me-1"></i>Register
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                @* Search Form *@
+                <form class="d-flex" asp-area="Customer" asp-controller="MenuItem" asp-action="Search" method="get">
+                    <input class="form-control me-sm-2" type="search" name="name" placeholder="Search menu..." />
+                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                </form>
+
+                @* User Greeting *@
+                @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">
-                            <i class="bi bi-person-plus me-1"></i>Register
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">
-                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
-                        </a>
-                    </li>
+                    <span class="navbar-text ms-3 text-white">
+                        <i class="bi bi-person me-1"></i>Hello @User.Identity.Name
+                    </span>
                 }
-            </ul>
-
-            @* Search Form *@
-            <form class="d-flex" asp-area="Customer" asp-controller="Category" asp-action="Search" method="get">
-                <input class="form-control me-sm-2" type="search" name="searchTerm" placeholder="Search menu..." />
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">
-                    <i class="bi bi-search me-1"></i>Search
-                </button>
-            </form>
-
-            @* User Greeting *@
-            @if (User.Identity.IsAuthenticated)
-            {
-                <span class="navbar-text ms-3 text-white">
-                    <i class="bi bi-person me-1"></i>Hello @User.Identity.Name
-                </span>
-            }
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>

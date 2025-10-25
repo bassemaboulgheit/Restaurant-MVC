@@ -1,46 +1,4 @@
-﻿@* @model Models.Cart
-
-<h2>Your Cart</h2>
-
-@if (!Model.CartItems.Any())
-{
-    <p>No items in your cart.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Item</th>
-                <th>Price</th>
-                <th>Qty</th>
-                <th>Total</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.CartItems)
-            {
-                <tr>
-                    <td>@item.Name</td>
-                    <td>@item.UnitPrice.ToString("C")</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.Total.ToString("C")</td>
-                    <td>
-                        <a asp-action="Remove" asp-route-id="@item.MenuItemId" class="btn btn-danger btn-sm">Remove</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <h4>Total: @Model.CartItems.Sum(i => i.Total).ToString("C")</h4>
-    <a asp-action="Clear" class="btn btn-warning">Clear Cart</a>
-    <a href="@Url.Action("Checkout", "Order")" class="btn btn-success">Proceed to Checkout</a>
-} *@
-
-
-@model Cart
+﻿@model Cart
 @using Models
 @{
     ViewData["Title"] = "My Cart";
@@ -84,7 +42,7 @@ else
                                                     }
                                                     <div>
                                                         <h6 class="mb-0">@item.Name</h6>
-                                                        <small class="text-muted">ID: @item.MenuItemId</small>
+                                                        @* <small class="text-muted">ID: @item.MenuItemId</small> *@
                                                     </div>
                                                 </div>
                                             </td>

@@ -1,5 +1,4 @@
-﻿@* @model ItemsDto
-@using System.Security.Claims
+﻿@model ItemsDto
 @using Applications.DTos.ItemDTOs
 @{
     ViewData["Title"] = "Item Details";
@@ -71,7 +70,7 @@
                             </div>
 
                             <!-- Available Quantity -->
-                            <div class="mb-4">
+                            @* <div class="mb-4">
                                 <h5 class="text-primary fw-bold">
                                     <i class="bi bi-box-seam me-2"></i>Available Quantity
                                 </h5>
@@ -80,185 +79,7 @@
                                         @Model.Quantity units
                                     </span>
                                 </p>
-                            </div>
-
-                            <!-- Order Section -->
-                            @if (Model.Quantity > 0)
-                            {
-                                @if (isAuthenticated)
-                                {
-                                    <!-- Form للمستخدمين المسجلين -->
-                                    <div class="mb-4 p-3 bg-light rounded">
-                                        <form asp-controller="Order" asp-action="Create" method="post">
-                                            <input type="hidden" name="itemId" value="@Model.Id" />
-                                            <div class="row align-items-end">
-                                                <div class="col-md-4 mb-2 mb-md-0">
-                                                    <label class="form-label fw-bold">Quantity:</label>
-                                                    <input type="number" name="quantity" class="form-control"
-                                                           value="1" min="1" max="@Model.Quantity" required>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <button type="submit" class="btn btn-success btn-lg w-100">
-                                                        <i class="bi bi-cart-plus me-2"></i>Add to Order
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <!-- رسالة للمستخدمين غير المسجلين -->
-                                    <div class="alert alert-warning">
-                                        <i class="bi bi-exclamation-circle me-2"></i>
-                                        Please <a asp-area="" asp-controller="Account" asp-action="Login"
-                                                  asp-route-returnUrl="@Context.Request.Path" class="alert-link fw-bold">login</a>
-                                        to add items to your order.
-                                    </div>
-                                    <a asp-area="Identity" asp-controller="Account" asp-action="Login"
-                                       asp-route-returnUrl="@Context.Request.Path"
-                                       class="btn btn-primary btn-lg w-100">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i>Login to Order
-                                    </a>
-                                }
-                            }
-                            else
-                            {
-                                <div class="alert alert-danger">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    This item is currently out of stock
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer with Action Buttons -->
-                <div class="card-footer bg-white border-top-0 text-center py-4">
-                    <a asp-controller="MenuItem" asp-action="GetAll" class="btn btn-secondary btn-lg px-5 me-2">
-                        <i class="bi bi-arrow-left me-2"></i>Back to Menu
-                    </a>
-                    @if (isAuthenticated)
-                    {
-                        <a asp-controller="Order" asp-action="ViewCart" class="btn btn-primary btn-lg px-5">
-                            <i class="bi bi-cart3 me-2"></i>View Cart
-                        </a>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .img-fluid {
-        transition: transform 0.3s ease;
-    }
-
-        .img-fluid:hover {
-            transform: scale(1.05);
-        }
-
-    .card {
-        animation: fadeIn 0.5s ease-in;
-    }
-
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style> *@
-
-
-@model ItemsDto
-@using Applications.DTos.ItemDTOs
-@{
-    ViewData["Title"] = "Item Details";
-    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
-    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-}
-
-<div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <h2 class="mb-0 fw-bold">
-                        <i class="bi bi-info-circle-fill me-2"></i>Item Details
-                    </h2>
-                </div>
-
-                <div class="card-body p-4">
-                    <div class="row">
-                        <!-- Image Section -->
-                        <div class="col-md-5 mb-4 mb-md-0">
-                            <div class="position-relative">
-                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                                {
-                                    <img src="@Model.ImageUrl" class="img-fluid rounded shadow"
-                                         alt="@Model.Name" style="width: 100%; height: 400px; object-fit: cover;">
-                                }
-                                else
-                                {
-                                    <div class="bg-light rounded d-flex align-items-center justify-content-center shadow"
-                                         style="width: 100%; height: 400px;">
-                                        <i class="bi bi-image text-muted" style="font-size: 6rem;"></i>
-                                    </div>
-                                }
-
-                                <!-- Stock Badge -->
-                                <span class="position-absolute top-0 end-0 m-3 badge @(Model.Quantity > 0 ? "bg-success" : "bg-danger") fs-6">
-                                    @(Model.Quantity > 0 ? "In Stock" : "Out of Stock")
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Details Section -->
-                        <div class="col-md-7">
-                            <!-- Item Name -->
-                            <h1 class="display-5 fw-bold text-dark mb-3">@Model.Name</h1>
-
-                            <!-- Category Badge -->
-                            <div class="mb-3">
-                                <span class="badge bg-primary fs-6 px-3 py-2">
-                                    <i class="bi bi-tag-fill me-1"></i>@Model.Category?.Name
-                                </span>
-                            </div>
-
-                            <!-- Description -->
-                            <div class="mb-4">
-                                <h5 class="text-primary fw-bold">
-                                    <i class="bi bi-card-text me-2"></i>Description
-                                </h5>
-                                <p class="text-muted fs-5">@Model.Description</p>
-                            </div>
-
-                            <!-- Price -->
-                            <div class="mb-4">
-                                <h5 class="text-primary fw-bold">
-                                    <i class="bi bi-currency-dollar me-2"></i>Price
-                                </h5>
-                                <h2 class="text-success fw-bold">@Model.Price.ToString("C")</h2>
-                            </div>
-
-                            <!-- Available Quantity -->
-                            <div class="mb-4">
-                                <h5 class="text-primary fw-bold">
-                                    <i class="bi bi-box-seam me-2"></i>Available Quantity
-                                </h5>
-                                <p class="fs-5">
-                                    <span class="badge @(Model.Quantity > 0 ? "bg-success" : "bg-danger") fs-6">
-                                        @Model.Quantity units
-                                    </span>
-                                </p>
-                            </div>
+                            </div> *@
 
                             <!-- Preparation Time -->
                             <div class="mb-4">

@@ -1,8 +1,11 @@
 using System.Security.Claims;
 using Applications.Contracts;
+using Applications.Mapping;
 using Applications.Services;
 using Infrastructure;
 using Infrastructure.Repository;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -47,14 +50,25 @@ namespace Restaurant
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
             });
 
+            MapsterConfig.RegisterMapsterConfiguration();
+
+            // Register Mapster Services
+            var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+            builder.Services.AddSingleton(mapsterConfig);
+            builder.Services.AddScoped<IMapper, Mapper>();
+
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICategoryService,CategoryService>();
             builder.Services.AddScoped<IMenuCategoryRepository,CategoryRepository>();
             builder.Services.AddScoped<IMenuItemService, MenuItemService>();
-            builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
+            //builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<ICartService, CartService>();
+
+            builder.Services.AddHostedService<OrderAutoTransitionService>();
+            builder.Services.AddHostedService<DailyAvailabilityService>();
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
@@ -64,7 +78,7 @@ namespace Restaurant
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            //app.UseMiddleware<Web_App_MVC.MiddleWare.DateMiddleWare>();
+            app.UseMiddleware<Web_App_MVC.MiddleWare.DateMiddleWare>();
 
             app.UseStaticFiles();
 
@@ -80,9 +94,9 @@ namespace Restaurant
                 name: "default",
                 //pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                //pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
+                pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
-            pattern: "{area=Customer}/{controller=MenuItem}/{action=getAll}/{id?}");
+            //pattern: "{area=Customer}/{controller=MenuItem}/{action=getAll}/{id?}");
 
             app.Run();
         }

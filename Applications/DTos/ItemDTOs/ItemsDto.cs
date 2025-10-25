@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Applications.DTos.CategoryDTOs;
 using Applications.DTos.OrderItemsDTOs;
+using Microsoft.AspNetCore.Http;
 using Models;
 
 namespace Applications.DTos.ItemDTOs
@@ -44,6 +45,9 @@ namespace Applications.DTos.ItemDTOs
         [Display(Name = "Image URL")]
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
+
+        [Display(Name = "Upload Image")]
+        public IFormFile? ImageFile { get; set; }
 
         [Required(ErrorMessage = "Preparation time is required")]
         [Range(1, 300, ErrorMessage = "Preparation time must be between 1 and 300 minutes")]

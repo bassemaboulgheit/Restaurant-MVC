@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Applications.Contracts;
 using Applications.DTos.CategoryDTOs;
 using Applications.DTos.ItemDTOs;
+using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
@@ -10,131 +14,179 @@ namespace Applications.Services
     public class CategoryService : ICategoryService
     {
         private readonly IGenericRepository<Category> _categoryRepo;
+        private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        //private readonly IMenuCategoryRepository categoryRepo;
-
-        public CategoryService(IGenericRepository<Category> _categoryRepo)
+        public CategoryService(
+            IGenericRepository<Category> categoryRepo,
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
-            this._categoryRepo = _categoryRepo;
+            _categoryRepo = categoryRepo;
+            _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private bool IsCurrentUserAdmin()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            return user?.IsInRole("Admin") ?? false;
         }
 
         public async Task<List<CategoryDto>> GetAll()
         {
-            var categories = await _categoryRepo.GetAll(i=>i.MenuItems);
-            var categoryDtos = categories.Select(category => new CategoryDto
+            bool isAdmin = IsCurrentUserAdmin();
+            var categories = await _categoryRepo.GetAll(i => i.MenuItems);
+
+            if (isAdmin)
             {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description,
-                Items = category.MenuItems?.Select(item => new ItemsDto
+                return categories.Select(category => new CategoryDto
                 {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Price = item.Price,
-                    ImageUrl = item.ImageUrl,
-                    CategoryId = item.CategoryId
-                }).ToList() ?? new List<ItemsDto>()
-            }).ToList();
-            return categoryDtos;
+                    Id = category.Id,
+                    Name = category.Name,
+                    Description = category.Description,
+                    Items = category.MenuItems?
+                        .Where(item => !item.IsDeleted)
+                        .Select(item => item.Adapt<ItemsDto>())
+                        .ToList() ?? new List<ItemsDto>()
+                }).ToList();
+            }
+            else
+            {
+                return categories
+                    .Where(c => c.MenuItems != null && c.MenuItems.Any(m => m.Quantity > 0 && !m.IsDeleted))
+                    .Select(category => new CategoryDto
+                    {
+                        Id = category.Id,
+                        Name = category.Name,
+                        Description = category.Description,
+                        Items = category.MenuItems?
+                            .Where(item => item.Quantity > 0 && !item.IsDeleted)
+                            .Select(item => item.Adapt<ItemsDto>())
+                            .ToList() ?? new List<ItemsDto>()
+                    }).ToList();
+            }
         }
+
         public async Task<CategoryDto?> GetById(int id)
         {
+            bool isAdmin = IsCurrentUserAdmin();
             var menuCategory = await _categoryRepo.GetById(id, i => i.MenuItems);
+
             if (menuCategory == null)
-            {
                 return null;
-            }
-            var categoryDto = new CategoryDto()
+
+            var categoryDto = new CategoryDto
             {
                 Id = menuCategory.Id,
                 Name = menuCategory.Name,
-                Description = menuCategory.Description,
-                Items = menuCategory.MenuItems?.Select(item => new ItemsDto
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Price = item.Price,
-                    Quantity = item.Quantity,
-                    ImageUrl = item.ImageUrl,
-                    CategoryId = item.CategoryId
-                }).ToList() ?? new List<ItemsDto>()
+                Description = menuCategory.Description
             };
+
+            if (isAdmin)
+            {
+                categoryDto.Items = menuCategory.MenuItems?
+                    .Where(item => !item.IsDeleted)
+                    .Select(item => item.Adapt<ItemsDto>())
+                    .ToList() ?? new List<ItemsDto>();
+            }
+            else
+            {
+                categoryDto.Items = menuCategory.MenuItems?
+                    .Where(item => item.Quantity > 0 && !item.IsDeleted)
+                    .Select(item => item.Adapt<ItemsDto>())
+                    .ToList() ?? new List<ItemsDto>();
+
+                if (categoryDto.Items.Count == 0)
+                    return null;
+            }
+
             return categoryDto;
         }
+
         public async Task<CategoryDto?> GetCategoryByName(string name)
         {
+            bool isAdmin = IsCurrentUserAdmin();
             var menuCategory = await _categoryRepo.GetName(name, c => c.MenuItems);
+
             if (menuCategory == null)
                 return null;
-            var categoryDto = new CategoryDto()
+
+            var categoryDto = new CategoryDto
             {
                 Id = menuCategory.Id,
                 Name = menuCategory.Name,
-                Description = menuCategory.Description,
-                Items = menuCategory.MenuItems?.Select(item => new ItemsDto
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Price = item.Price,
-                    ImageUrl = item.ImageUrl,
-                    CategoryId = item.CategoryId
-                }).ToList() ?? new List<ItemsDto>()
+                Description = menuCategory.Description
             };
+
+            if (isAdmin)
+            {
+                categoryDto.Items = menuCategory.MenuItems?
+                    .Where(item => !item.IsDeleted)
+                    .Select(item => item.Adapt<ItemsDto>())
+                    .ToList() ?? new List<ItemsDto>();
+            }
+            else
+            {
+                categoryDto.Items = menuCategory.MenuItems?
+                    .Where(item => item.Quantity > 0 && !item.IsDeleted)
+                    .Select(item => item.Adapt<ItemsDto>())
+                    .ToList() ?? new List<ItemsDto>();
+
+                if (categoryDto.Items.Count == 0)
+                    return null;
+            }
+
             return categoryDto;
         }
 
         public async Task Create(CreateCategoryDto newCategory)
         {
             if (newCategory == null)
-            {
                 return;
-            }
-            var category = new Category()
-            {
-                Name = newCategory.Name,
-                Description = newCategory.Description,
-            };
+
+            var category = newCategory.Adapt<Category>();
+
             await _categoryRepo.Create(category);
             await _categoryRepo.Save();
         }
-        public async Task Update(CategoryDto newCategory)
+
+        public async Task Update(CategoryDto categoryDto)
         {
-            var category = await _categoryRepo.GetById(newCategory.Id);
+            var category = await _categoryRepo.GetById(categoryDto.Id);
             if (category == null)
-            {
                 return;
-            }
-            category.Name = newCategory.Name;
-            category.Description = newCategory.Description;
+
+            category.Name = categoryDto.Name;
+            category.Description = categoryDto.Description;
+
             await _categoryRepo.Update(category);
             await _categoryRepo.Save();
         }
+
         public async Task Delete(int id)
         {
-            var category = await _categoryRepo.GetById(id);
+            var category = await _categoryRepo.GetById(id, c => c.MenuItems);
             if (category == null)
-            {
                 return;
-            }
+
             await _categoryRepo.Delete(id);
-            foreach (var item in category.MenuItems)
+
+            if (category.MenuItems != null)
             {
-                item.IsDeleted = true;
+                foreach (var item in category.MenuItems)
+                {
+                    item.IsDeleted = true;
+                }
             }
+
             await _categoryRepo.Save();
         }
 
         public async Task<bool> GetByName(string name)
         {
             var category = await _categoryRepo.GetByName(name);
-            if (category)
-            {
-                return category;
-            }
-            return false;
+            return category;
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Applications.DTos.AdminDTOs;
 using Applications.DTos.UsersDTo;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -17,12 +17,18 @@ namespace Applications.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IMapper _mapper;
 
-        public UserService(UserManager<ApplicationUser> _userManager , SignInManager<ApplicationUser> _signInManager , RoleManager<IdentityRole> _roleManager)
+        public UserService(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
+            IMapper mapper)
         {
-            this._userManager = _userManager;
-            this._signInManager = _signInManager;
-            this._roleManager = _roleManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
+            _mapper = mapper;
         }
 
         public async Task<IdentityResult> CreateAsync(RegisterDto userDto)
@@ -37,28 +43,20 @@ namespace Applications.Services
             var userName = await _userManager.FindByNameAsync(userDto.userName);
             if (userName != null)
                 return IdentityResult.Failed(new IdentityError { Description = "Username is already in use" });
-            
-            //mapping DTO to ApplicationUser
-            var applicationUser = new ApplicationUser
-            {
-                UserName = userDto.userName,
-                Email = userDto.Email,
-                Address = userDto.Address
-            };
 
-            // save user to database
+            // Using Mapster for mapping
+            var applicationUser = userDto.Adapt<ApplicationUser>();
+
             var result = await _userManager.CreateAsync(applicationUser, userDto.Password);
             if (result.Succeeded)
             {
-                var role = await _userManager.AddToRoleAsync(applicationUser, "Customer");
-
+                await _userManager.AddToRoleAsync(applicationUser, "Customer");
                 await _signInManager.SignInAsync(applicationUser, isPersistent: false);
                 return IdentityResult.Success;
             }
 
             var allErrors = result.Errors.Select(e => new IdentityError { Description = e.Description }).ToArray();
             return IdentityResult.Failed(allErrors);
-
         }
 
         public async Task<SignInResult> SignInAsync(LoginDto userDto)
@@ -84,12 +82,9 @@ namespace Applications.Services
         {
             bool exists = await _roleManager.RoleExistsAsync(role.roleName);
             if (exists)
-                return IdentityResult.Failed(new IdentityError { Description = $"Role '{role.roleName}' already exists"});
-            
-            var identityRole = new IdentityRole
-            {
-                Name = role.roleName,
-            };
+                return IdentityResult.Failed(new IdentityError { Description = $"Role '{role.roleName}' already exists" });
+
+            var identityRole = new IdentityRole { Name = role.roleName };
             var result = await _roleManager.CreateAsync(identityRole);
             return result;
         }

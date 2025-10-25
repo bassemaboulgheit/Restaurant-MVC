@@ -1,10 +1,11 @@
 ﻿@using Applications.DTos.OrderDTOs
 @using Applications.DTos.OrderItemsDTOs
+@using Models
 @model OrderDto
 
 @{
-    ViewData["Title"] = "Order Details";
-    Layout = "~/Areas/Customer/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Order Details - Admin";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
 }
 
 <div class="container mt-5 mb-5">
@@ -12,25 +13,6 @@
         <div class="col-md-8">
             <h2>Order #@Model.Id</h2>
             <hr />
-
-            <!-- Status Notification -->
-            @if (!string.IsNullOrEmpty(ViewBag.StatusMessage?.ToString()))
-            {
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <strong>📢 Status Update:</strong><br />
-                    @ViewBag.StatusMessage
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            <!-- Prep Time Remaining -->
-            @if (!string.IsNullOrEmpty(ViewBag.PrepTimeRemaining?.ToString()))
-            {
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>⏱️ Preparation Time:</strong> @ViewBag.PrepTimeRemaining
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
 
             <!-- Customer Information -->
             <div class="card mb-4">
@@ -153,7 +135,7 @@
             </div>
         </div>
 
-        <!-- Sidebar - Price Summary -->
+        <!-- Sidebar - Price Summary & Admin Actions -->
         <div class="col-md-4">
             <div class="card sticky-top" style="top: 20px;">
                 <div class="card-header bg-primary text-white">
@@ -182,17 +164,52 @@
                         <h5>Total:</h5>
                         <h5 class="text-success">$@Model.TotalAmount.ToString("F2")</h5>
                     </div>
+
+                    <!-- Admin Actions -->
+                    <hr />
+                    <h6 class="mb-3">Admin Actions</h6>
+
+                    <!-- Update Status -->
+                    <form method="post" asp-action="UpdateStatus" asp-controller="Order" asp-area="Admin" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <label class="form-label fw-bold">Update Status:</label>
+                        <select name="status" class="form-select form-select-sm mb-2">
+                            <option value=""> --- Select Status -- </option>
+                            <option value="0">Pending</option>
+                            <option value="1">Preparing</option>
+                            <option value="2">Ready</option>
+                            <option value="3">Delivered</option>
+                            @if (Model.OrderStatus != OrderStatus.Delivered || Model.OrderStatus != OrderStatus.Ready)
+                            {
+                            <option value="4">Cancelled</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-warning w-100">
+                            <i class="bi bi-arrow-repeat me-1"></i>Update Status
+                        </button>
+                    </form>
+
+                    <!-- Delete Order -->
+                    <form method="post" asp-action="Delete" asp-controller="Order" asp-area="Admin">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger w-100" 
+                                onclick="return confirm('Are you sure you want to delete this order?')">
+                            <i class="bi bi-trash me-1"></i>Delete Order
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="mt-4">
-        <a href="@Url.Action("MyOrders", "Order", new { area = "Customer" })" class="btn btn-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Back to My Orders
+        <a href="@Url.Action("Index", "Order", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Orders
         </a>
-        <a href="@Url.Action("GetAll", "MenuItem", new { area = "Customer" })" class="btn btn-primary">
-            <i class="bi bi-menu-button me-1"></i>Back to Menu
+        <a href="@Url.Action("Getall", "MenuItem", new { area = "Admin" })" class="btn btn-primary">
+            <i class="bi bi-speedometer2 me-1"></i>Back to Dashboard
         </a>
     </div>
 </div>

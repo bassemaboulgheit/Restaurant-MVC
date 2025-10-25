@@ -37,11 +37,11 @@ namespace Restaurant.areas.Customer.Controllers
                 TempData["Message"] = "Please enter a valid item name.";
                 return RedirectToAction(nameof(GetAll));
             }
-            var item = await _itemService.GetItemByName(name);
+            var items = await _itemService.GetListItemByName(name);
 
-            if (item != null)
+            if (items != null && items.Count > 0)
             {
-                return View("Details", item);
+                return View(nameof(GetAll), items);
             }
             TempData["Message"] = "No item found with that name.";
             return RedirectToAction(nameof(GetAll));

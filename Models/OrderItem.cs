@@ -26,21 +26,14 @@ namespace Models
         [Display(Name = "Order")]
         [ForeignKey("Order")]
         public int OrderId { get; set; }
+        public  Order Order { get; set; } 
 
         [Required]
         [Display(Name = "Menu Item")]
-        [ForeignKey("MenuItem")]
         public int MenuItemId { get; set; }
-        public  Order Order { get; set; } 
+        [ForeignKey(nameof(MenuItemId))]
         public  MenuItem MenuItem { get; set; } 
 
-
-
-        // Business Logic Method
-        //public void CalculateSubtotal()
-        //{
-        //    Subtotal = Quantity * UnitPrice;
-        //}
     }
 
 }

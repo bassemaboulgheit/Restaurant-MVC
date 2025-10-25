@@ -6,6 +6,8 @@ using Applications.Contracts;
 using Applications.DTos.ItemDTOs;
 using Applications.DTos.OrderDTOs;
 using Applications.DTos.OrderItemsDTOs;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
@@ -16,20 +18,22 @@ namespace Applications.Services
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IGenericRepository<OrderItem> _orderItemRepository;
         private readonly IGenericRepository<MenuItem> _menuItemRepository;
+        private readonly IMapper _mapper;
 
         public OrderService(
             IGenericRepository<Order> orderRepository,
             IGenericRepository<OrderItem> orderItemRepository,
-            IGenericRepository<MenuItem> menuItemRepository)
+            IGenericRepository<MenuItem> menuItemRepository,
+            IMapper mapper)
         {
             _orderRepository = orderRepository;
             _orderItemRepository = orderItemRepository;
             _menuItemRepository = menuItemRepository;
+            _mapper = mapper;
         }
 
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrderDto, string userId)
         {
-            // Calculate subtotal from order items
             decimal subtotal = 0;
             var orderItems = new List<OrderItem>();
 
@@ -39,45 +43,31 @@ namespace Applications.Services
                 if (menuItem == null)
                     throw new Exception($"Menu item with ID {itemDto.MenuItemId} not found");
 
-                var orderItem = new OrderItem
-                {
-                    MenuItemId = itemDto.MenuItemId,
-                    Quantity = itemDto.Quantity,
-                    UnitPrice = itemDto.UnitPrice,
-                    Subtotal = itemDto.Quantity * itemDto.UnitPrice
-                };
+                if (menuItem.Quantity < itemDto.Quantity)
+                    throw new Exception($"Not enough stock for item: {menuItem.Name}");
+
+                var orderItem = itemDto.Adapt<OrderItem>();
+                orderItem.MenuItem = menuItem;
+                orderItem.Subtotal = itemDto.Quantity * itemDto.UnitPrice;
 
                 subtotal += orderItem.Subtotal;
                 orderItems.Add(orderItem);
             }
 
-            // Calculate discount
             decimal discountAmount = CalculateDiscount(subtotal, createOrderDto.OrderDate);
-
-            // Calculate tax
             decimal taxAmount = CalculateTax(subtotal, discountAmount);
-
-            // Calculate total
             decimal totalAmount = CalculateTotal(subtotal, discountAmount, taxAmount);
 
-            // Create order
-            var order = new Order
-            {
-                CustomerName = createOrderDto.CustomerName,
-                CustomerPhone = createOrderDto.CustomerPhone,
-                CustomerEmail = createOrderDto.CustomerEmail,
-                OrderType = createOrderDto.OrderType,
-                OrderStatus = OrderStatus.Pending,
-                OrderDate = DateTime.Now,
-                DeliveryAddress = createOrderDto.DeliveryAddress ?? "",
-                ApplicationUserId = userId,
-                Subtotal = subtotal,
-                DiscountAmount = discountAmount,
-                TaxAmount = taxAmount,
-                TotalAmount = totalAmount,
-                OrderItems = orderItems,
-                LastUpdated = DateTime.Now
-            };
+            var order = createOrderDto.Adapt<Order>();
+            order.OrderStatus = OrderStatus.Pending;
+            order.OrderDate = DateTime.Now;
+            order.ApplicationUserId = userId;
+            order.Subtotal = subtotal;
+            order.DiscountAmount = discountAmount;
+            order.TaxAmount = taxAmount;
+            order.TotalAmount = totalAmount;
+            order.OrderItems = orderItems;
+            order.LastUpdated = DateTime.Now;
 
             if (createOrderDto.OrderType == OrderType.Delivery)
             {
@@ -87,7 +77,35 @@ namespace Applications.Services
             await _orderRepository.Create(order);
             await _orderRepository.Save();
 
-            return MapOrderToDto(order);
+            foreach (var orderItem in orderItems)
+            {
+                var menuItem = await _menuItemRepository.GetById(orderItem.MenuItemId);
+                if (menuItem != null)
+                {
+                    if (menuItem.LastResetDate.Date < DateTime.Today)
+                    {
+                        menuItem.DailyOrderCount = 0;
+                        menuItem.LastResetDate = DateTime.Today;
+                    }
+
+                    menuItem.DailyOrderCount += orderItem.Quantity;
+
+                    if (menuItem.Quantity >= orderItem.Quantity)
+                        menuItem.Quantity -= orderItem.Quantity;
+                    else
+                        throw new Exception($"Not enough quantity for item {menuItem.Name}");
+
+                    if (menuItem.DailyOrderCount >= 50)
+                    {
+                        menuItem.Quantity = 0;
+                    }
+
+                    await _menuItemRepository.Update(menuItem);
+                    await _menuItemRepository.Save();
+                }
+            }
+
+            return order.Adapt<OrderDto>();
         }
 
         public async Task<OrderDto> GetOrderByIdAsync(int id)
@@ -99,7 +117,18 @@ namespace Applications.Services
             if (order == null)
                 throw new Exception("Order not found");
 
-            return MapOrderToDto(order);
+            if (order.OrderItems != null)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    if (item.MenuItem == null && item.MenuItemId > 0)
+                    {
+                        item.MenuItem = await _menuItemRepository.GetById(item.MenuItemId);
+                    }
+                }
+            }
+
+            return order.Adapt<OrderDto>();
         }
 
         public async Task<List<OrderDto>> GetAllOrdersAsync()
@@ -108,7 +137,21 @@ namespace Applications.Services
                 o => o.OrderItems,
                 o => o.ApplicationUser);
 
-            return orders.Select(o => MapOrderToDto(o)).ToList();
+            foreach (var order in orders)
+            {
+                if (order.OrderItems != null)
+                {
+                    foreach (var item in order.OrderItems)
+                    {
+                        if (item.MenuItem == null && item.MenuItemId > 0)
+                        {
+                            item.MenuItem = await _menuItemRepository.GetById(item.MenuItemId);
+                        }
+                    }
+                }
+            }
+
+            return orders.Adapt<List<OrderDto>>();
         }
 
         public async Task<List<OrderDto>> GetUserOrdersAsync(string userId)
@@ -118,7 +161,22 @@ namespace Applications.Services
                 o => o.ApplicationUser);
 
             var userOrders = orders.Where(o => o.ApplicationUserId == userId).ToList();
-            return userOrders.Select(o => MapOrderToDto(o)).ToList();
+
+            foreach (var order in userOrders)
+            {
+                if (order.OrderItems != null)
+                {
+                    foreach (var item in order.OrderItems)
+                    {
+                        if (item.MenuItem == null && item.MenuItemId > 0)
+                        {
+                            item.MenuItem = await _menuItemRepository.GetById(item.MenuItemId);
+                        }
+                    }
+                }
+            }
+
+            return userOrders.Adapt<List<OrderDto>>();
         }
 
         public async Task<OrderDto> UpdateOrderAsync(int id, OrderDto orderDto)
@@ -137,7 +195,7 @@ namespace Applications.Services
             await _orderRepository.Update(order);
             await _orderRepository.Save();
 
-            return MapOrderToDto(order);
+            return order.Adapt<OrderDto>();
         }
 
         public async Task<OrderDto> UpdateOrderStatusAsync(int id, OrderStatus status)
@@ -153,12 +211,41 @@ namespace Applications.Services
             await _orderRepository.Update(order);
             await _orderRepository.Save();
 
-            return MapOrderToDto(order);
+            return order.Adapt<OrderDto>();
         }
 
         public async Task<bool> DeleteOrderAsync(int id)
         {
+            var order = await _orderRepository.GetById(id);
+            if (order.OrderStatus == OrderStatus.Ready || order.OrderStatus == OrderStatus.Delivered)
+                return false;
+
             await _orderRepository.Delete(id);
+            await _orderRepository.Save();
+            return true;
+        }
+
+        public async Task<bool> Cancel(int id)
+        {
+            var order = await _orderRepository.GetById(id);
+            if (order == null)
+                return false;
+            if (order.OrderStatus == OrderStatus.Delivered || order.OrderStatus == OrderStatus.Ready)
+                return false;
+
+            order.OrderStatus = OrderStatus.Cancelled;
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItem = await _menuItemRepository.GetById(item.MenuItemId);
+                if (menuItem != null)
+                {
+                    menuItem.Quantity += item.Quantity;
+                    await _menuItemRepository.Update(menuItem);
+                }
+            }
+
+            await _menuItemRepository.Save();
             await _orderRepository.Save();
             return true;
         }
@@ -174,7 +261,7 @@ namespace Applications.Services
         public async Task<List<OrderDto>> GetDeletedOrdersAsync()
         {
             var deletedOrders = await _orderRepository.GetAllDeleted();
-            return deletedOrders.Select(o => MapOrderToDto(o)).ToList();
+            return deletedOrders.Adapt<List<OrderDto>>();
         }
 
         // Helper Methods
@@ -182,11 +269,9 @@ namespace Applications.Services
         {
             decimal discount = 0;
 
-            // Happy hour discount (20% off from 3-5 PM)
             if (orderDate.Hour >= 15 && orderDate.Hour < 17)
                 discount += subtotal * 0.20m;
 
-            // Bulk discount (10% off orders over $100)
             if (subtotal > 100)
                 discount += subtotal * 0.10m;
 
@@ -214,57 +299,6 @@ namespace Applications.Services
             }
 
             return DateTime.Now.AddMinutes(maxPrepTime + 30);
-        }
-
-        // Manual Mapping
-        private OrderDto MapOrderToDto(Order order)
-        {
-            return new OrderDto
-            {
-                Id = order.Id,
-                CustomerName = order.CustomerName,
-                CustomerPhone = order.CustomerPhone,
-                CustomerEmail = order.CustomerEmail,
-                OrderType = order.OrderType,
-                OrderStatus = order.OrderStatus,
-                OrderDate = order.OrderDate,
-                DeliveryAddress = order.DeliveryAddress,
-                Subtotal = order.Subtotal,
-                TaxAmount = order.TaxAmount,
-                DiscountAmount = order.DiscountAmount,
-                TotalAmount = order.TotalAmount,
-                EstimatedDeliveryTime = order.EstimatedDeliveryTime,
-                TotalPreparationTime = order.TotalPreparationTime,
-                LastUpdated = order.LastUpdated,
-                userId = order.ApplicationUserId,
-                OrderItems = order.OrderItems?.Select(oi => new OrderItemsDto
-                {
-                    Id = oi.Id,
-                    MenuItemId = oi.MenuItemId,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice,
-                    Subtotal = oi.Subtotal,
-                    OrderId = oi.OrderId,
-                    MenuItem = oi.MenuItem != null ? MapMenuItemToDto(oi.MenuItem) : null
-                }).ToList() ?? new List<OrderItemsDto>()
-            };
-        }
-
-        private ItemsDto MapMenuItemToDto(MenuItem menuItem)
-        {
-            return new ItemsDto
-            {
-                Id = menuItem.Id,
-                Name = menuItem.Name,
-                Description = menuItem.Description,
-                Price = menuItem.Price,
-                CategoryId = menuItem.CategoryId,
-                Quantity = menuItem.Quantity,
-                ImageUrl = menuItem.ImageUrl,
-                PreparationTime = menuItem.PreparationTime,
-                DailyOrderCount = menuItem.DailyOrderCount,
-                LastResetDate = menuItem.LastResetDate
-            };
         }
     }
 }
